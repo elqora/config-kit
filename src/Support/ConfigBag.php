@@ -29,6 +29,16 @@ readonly class ConfigBag implements JsonSerializable
         return $this->options[$key] ?? $default;
     }
 
+    public function filledOption(string $key, mixed $default = null): mixed
+    {
+        $value = $this->option($key, $default);
+
+        if (is_string($value) && trim($value) === '') {
+            return $default;
+        }
+
+        return $value;
+    }
     public function secret(string $key, mixed $default = null): mixed
     {
         return $this->secrets[$key] ?? $default;
