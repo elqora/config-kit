@@ -1,25 +1,25 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Tests;
+namespace Timeax\ConfigKit\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Timeax\ConfigSchema\Contracts\ProvidesConfigSchema;
-use Timeax\ConfigSchema\Runtime\HandlerDefinition;
-use Timeax\ConfigSchema\Runtime\MapHandlerTargetResolver;
-use Timeax\ConfigSchema\Schema\ConfigSchema;
-use Timeax\ConfigSchema\Schema\UiConfigSchema;
-use Timeax\ConfigSchema\Support\ConfigBag;
-use Timeax\ConfigSchema\Support\ConfigValidationResult;
+use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
+use Timeax\ConfigKit\Runtime\HandlerDefinition;
+use Timeax\ConfigKit\Runtime\MapHandlerTargetResolver;
+use Timeax\ConfigKit\Schema\ConfigSchema;
+use Timeax\ConfigKit\Schema\UiConfigSchema;
+use Timeax\ConfigKit\Support\ConfigBag;
+use Timeax\ConfigKit\Support\ConfigValidationResult;
 
 final class RuntimeMapHandlerTargetResolverTest extends TestCase
 {
     public function testRuntimeHandlerClassesAreAutoloadable(): void
     {
-        self::assertTrue(interface_exists(\Timeax\ConfigSchema\Contracts\HandlerTargetResolver::class));
+        self::assertTrue(interface_exists(\Timeax\ConfigKit\Contracts\HandlerTargetResolver::class));
         self::assertTrue(class_exists(HandlerDefinition::class));
         self::assertTrue(class_exists(MapHandlerTargetResolver::class));
-        self::assertTrue(class_exists(\Timeax\ConfigSchema\Runtime\ResolvedHandlerTarget::class));
+        self::assertTrue(class_exists(\Timeax\ConfigKit\Runtime\ResolvedHandlerTarget::class));
     }
 
     public function testResolvesHandlerTargetAndDriverFromMap(): void

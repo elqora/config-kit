@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Contracts;
+namespace Timeax\ConfigKit\Contracts;
 
-use Timeax\ConfigSchema\Schema\ConfigSchema;
-use Timeax\ConfigSchema\Schema\UiConfigSchema;
-use Timeax\ConfigSchema\Support\ConfigBag;
-use Timeax\ConfigSchema\Support\ConfigValidationResult;
+use Timeax\ConfigKit\Schema\ConfigSchema;
+use Timeax\ConfigKit\Schema\UiConfigSchema;
+use Timeax\ConfigKit\Support\ConfigBag;
+use Timeax\ConfigKit\Support\ConfigValidationResult;
 
 interface ProvidesConfigSchema
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Schema;
+namespace Timeax\ConfigKit\Schema;
 
 use JsonSerializable;
 

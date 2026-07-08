@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Runtime;
+namespace Timeax\ConfigKit\Runtime;
 
-use Timeax\ConfigSchema\Contracts\ConfigFieldValidator;
+use Timeax\ConfigKit\Contracts\ConfigFieldValidator;
 
 final class NoopConfigFieldValidator implements ConfigFieldValidator
 {

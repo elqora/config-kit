@@ -1,17 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Tests;
+namespace Timeax\ConfigKit\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Timeax\ConfigSchema\Contracts\ConfigFieldValidator;
-use Timeax\ConfigSchema\Runtime\ConfigSchemaStore;
-use Timeax\ConfigSchema\Schema\ConfigField;
-use Timeax\ConfigSchema\Schema\ConfigGroup;
-use Timeax\ConfigSchema\Schema\ConfigOption;
-use Timeax\ConfigSchema\Schema\ConfigTab;
-use Timeax\ConfigSchema\Schema\UiConfigSchema;
-use Timeax\ConfigSchema\Support\ConfigBag;
-use Timeax\ConfigSchema\Support\ConfigValidationError;
+use Timeax\ConfigKit\Contracts\ConfigFieldValidator;
+use Timeax\ConfigKit\Runtime\ConfigSchemaStore;
+use Timeax\ConfigKit\Schema\ConfigField;
+use Timeax\ConfigKit\Schema\ConfigGroup;
+use Timeax\ConfigKit\Schema\ConfigOption;
+use Timeax\ConfigKit\Schema\ConfigTab;
+use Timeax\ConfigKit\Schema\UiConfigSchema;
+use Timeax\ConfigKit\Support\ConfigBag;
+use Timeax\ConfigKit\Support\ConfigValidationError;
 
 final class RuntimeConfigSchemaStoreTest extends TestCase
 {

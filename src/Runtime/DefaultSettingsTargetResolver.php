@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Runtime;
+namespace Timeax\ConfigKit\Runtime;
 
-use Timeax\ConfigSchema\Contracts\SettingsContract;
-use Timeax\ConfigSchema\Contracts\SettingsTargetResolver;
+use Timeax\ConfigKit\Contracts\SettingsContract;
+use Timeax\ConfigKit\Contracts\SettingsTargetResolver;
 
 final class DefaultSettingsTargetResolver implements SettingsTargetResolver
 {

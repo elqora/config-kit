@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Tests;
+namespace Timeax\ConfigKit\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Timeax\ConfigSchema\Schema\ConfigField;
-use Timeax\ConfigSchema\Schema\ConfigGroup;
-use Timeax\ConfigSchema\Schema\ConfigOption;
-use Timeax\ConfigSchema\Schema\ConfigSchema;
-use Timeax\ConfigSchema\Schema\UiConfigSchema;
+use Timeax\ConfigKit\Schema\ConfigField;
+use Timeax\ConfigKit\Schema\ConfigGroup;
+use Timeax\ConfigKit\Schema\ConfigOption;
+use Timeax\ConfigKit\Schema\ConfigSchema;
+use Timeax\ConfigKit\Schema\UiConfigSchema;
 
 final class ConfigFieldOptionsTest extends TestCase
 {
@@ -103,7 +103,7 @@ final class ConfigFieldOptionsTest extends TestCase
         );
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('expected Timeax\\ConfigSchema\\Schema\\ConfigOption');
+        $this->expectExceptionMessage('expected Timeax\ConfigKit\Schema\ConfigOption');
 
         $field->resolveOptions();
     }

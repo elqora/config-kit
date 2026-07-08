@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Tests;
+namespace Timeax\ConfigKit\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Timeax\ConfigSchema\Schema\ConfigOption;
+use Timeax\ConfigKit\Schema\ConfigOption;
 
 final class ConfigOptionChildrenTest extends TestCase
 {
@@ -77,7 +77,7 @@ final class ConfigOptionChildrenTest extends TestCase
         );
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('expected Timeax\\ConfigSchema\\Schema\\ConfigOption');
+        $this->expectExceptionMessage('expected Timeax\ConfigKit\Schema\ConfigOption');
 
         $option->resolveChildren();
     }

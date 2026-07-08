@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Support;
+namespace Timeax\ConfigKit\Support;
 
 use JsonSerializable;
-use Timeax\ConfigSchema\Schema\ConfigSchema;
+use Timeax\ConfigKit\Schema\ConfigSchema;
 
 readonly class ConfigBag implements JsonSerializable
 {

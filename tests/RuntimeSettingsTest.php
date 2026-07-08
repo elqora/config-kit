@@ -1,21 +1,21 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Tests;
+namespace Timeax\ConfigKit\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Timeax\ConfigSchema\Contracts\SettingsContract;
-use Timeax\ConfigSchema\Contracts\SettingsTargetResolver;
-use Timeax\ConfigSchema\Runtime\ConfigSchemaRecord;
-use Timeax\ConfigSchema\Runtime\ConfigSchemaService;
-use Timeax\ConfigSchema\Runtime\SettingsManager;
-use Timeax\ConfigSchema\Runtime\SettingsProviderRegistry;
-use Timeax\ConfigSchema\Runtime\SettingsTarget;
-use Timeax\ConfigSchema\Schema\ConfigField;
-use Timeax\ConfigSchema\Schema\ConfigSchema;
-use Timeax\ConfigSchema\Schema\UiConfigSchema;
-use Timeax\ConfigSchema\Support\ConfigBag;
-use Timeax\ConfigSchema\Support\ConfigValidationResult;
+use Timeax\ConfigKit\Contracts\SettingsContract;
+use Timeax\ConfigKit\Contracts\SettingsTargetResolver;
+use Timeax\ConfigKit\Runtime\ConfigSchemaRecord;
+use Timeax\ConfigKit\Runtime\ConfigSchemaService;
+use Timeax\ConfigKit\Runtime\SettingsManager;
+use Timeax\ConfigKit\Runtime\SettingsProviderRegistry;
+use Timeax\ConfigKit\Runtime\SettingsTarget;
+use Timeax\ConfigKit\Schema\ConfigField;
+use Timeax\ConfigKit\Schema\ConfigSchema;
+use Timeax\ConfigKit\Schema\UiConfigSchema;
+use Timeax\ConfigKit\Support\ConfigBag;
+use Timeax\ConfigKit\Support\ConfigValidationResult;
 
 final class RuntimeSettingsTest extends TestCase
 {
@@ -144,7 +144,7 @@ final class RuntimeSettingsTest extends TestCase
             ]),
             repository: $repository,
             schemas: new ConfigSchemaService($repository),
-            targetResolver: $resolver ?? new \Timeax\ConfigSchema\Runtime\DefaultSettingsTargetResolver(),
+            targetResolver: $resolver ?? new \Timeax\ConfigKit\Runtime\DefaultSettingsTargetResolver(),
         );
     }
 }

@@ -1,19 +1,19 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Tests;
+namespace Timeax\ConfigKit\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Timeax\ConfigSchema\Contracts\ConfigFieldValidator;
-use Timeax\ConfigSchema\Contracts\ConfigSchemaRepository;
-use Timeax\ConfigSchema\Contracts\ProvidesConfigSchema;
-use Timeax\ConfigSchema\Runtime\ConfigSchemaRecord;
-use Timeax\ConfigSchema\Runtime\ConfigSchemaService;
-use Timeax\ConfigSchema\Schema\ConfigField;
-use Timeax\ConfigSchema\Schema\ConfigSchema;
-use Timeax\ConfigSchema\Schema\UiConfigSchema;
-use Timeax\ConfigSchema\Support\ConfigBag;
-use Timeax\ConfigSchema\Support\ConfigValidationResult;
+use Timeax\ConfigKit\Contracts\ConfigFieldValidator;
+use Timeax\ConfigKit\Contracts\ConfigSchemaRepository;
+use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
+use Timeax\ConfigKit\Runtime\ConfigSchemaRecord;
+use Timeax\ConfigKit\Runtime\ConfigSchemaService;
+use Timeax\ConfigKit\Schema\ConfigField;
+use Timeax\ConfigKit\Schema\ConfigSchema;
+use Timeax\ConfigKit\Schema\UiConfigSchema;
+use Timeax\ConfigKit\Support\ConfigBag;
+use Timeax\ConfigKit\Support\ConfigValidationResult;
 
 final class RuntimeConfigSchemaServiceTest extends TestCase
 {
@@ -277,15 +277,15 @@ final class RuntimeProviderDriver implements ProvidesConfigSchema
     }
 }
 
-final readonly class RuntimeSingleDriverResolver implements \Timeax\ConfigSchema\Contracts\HandlerTargetResolver
+final readonly class RuntimeSingleDriverResolver implements \Timeax\ConfigKit\Contracts\HandlerTargetResolver
 {
     public function __construct(private RuntimeProviderDriver $driver)
     {
     }
 
-    public function resolve(string $key, int|string $id): \Timeax\ConfigSchema\Runtime\ResolvedHandlerTarget
+    public function resolve(string $key, int|string $id): \Timeax\ConfigKit\Runtime\ResolvedHandlerTarget
     {
-        $definition = new \Timeax\ConfigSchema\Runtime\HandlerDefinition(
+        $definition = new \Timeax\ConfigKit\Runtime\HandlerDefinition(
             key: $key,
             targetType: $key,
             loadTarget: static fn(): RuntimeTarget => new RuntimeTarget((int) $id),
@@ -294,7 +294,7 @@ final readonly class RuntimeSingleDriverResolver implements \Timeax\ConfigSchema
 
         $target = $definition->targetFor($id);
 
-        return new \Timeax\ConfigSchema\Runtime\ResolvedHandlerTarget(
+        return new \Timeax\ConfigKit\Runtime\ResolvedHandlerTarget(
             handlerKey: $key,
             target: $target,
             targetId: $definition->targetIdFor($target, $id),

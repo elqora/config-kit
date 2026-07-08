@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Contracts;
+namespace Timeax\ConfigKit\Contracts;
 
-use Timeax\ConfigSchema\Support\ConfigValidationError;
+use Timeax\ConfigKit\Support\ConfigValidationError;
 
 interface ConfigFieldValidator
 {

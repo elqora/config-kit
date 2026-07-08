@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Runtime;
+namespace Timeax\ConfigKit\Runtime;
 
-use Timeax\ConfigSchema\Contracts\ProvidesConfigSchema;
-use Timeax\ConfigSchema\Support\ConfigBag;
-use Timeax\ConfigSchema\Support\ConfigValidationError;
+use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
+use Timeax\ConfigKit\Support\ConfigBag;
+use Timeax\ConfigKit\Support\ConfigValidationError;
 
 final readonly class ConfigApplyResult
 {

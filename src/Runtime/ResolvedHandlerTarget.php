@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Runtime;
+namespace Timeax\ConfigKit\Runtime;
 
-use Timeax\ConfigSchema\Contracts\ProvidesConfigSchema;
+use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
 
 final readonly class ResolvedHandlerTarget
 {

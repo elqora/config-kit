@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Runtime;
+namespace Timeax\ConfigKit\Runtime;
 
 use RuntimeException;
-use Timeax\ConfigSchema\Contracts\ConfigSchemaRepository;
-use Timeax\ConfigSchema\Contracts\SettingsContract;
-use Timeax\ConfigSchema\Contracts\SettingsTargetResolver;
-use Timeax\ConfigSchema\Schema\UiConfigSchema;
-use Timeax\ConfigSchema\Support\ConfigBag;
+use Timeax\ConfigKit\Contracts\ConfigSchemaRepository;
+use Timeax\ConfigKit\Contracts\SettingsContract;
+use Timeax\ConfigKit\Contracts\SettingsTargetResolver;
+use Timeax\ConfigKit\Schema\UiConfigSchema;
+use Timeax\ConfigKit\Support\ConfigBag;
 
 final readonly class SettingsManager
 {

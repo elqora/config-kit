@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Runtime;
+namespace Timeax\ConfigKit\Runtime;
 
 use InvalidArgumentException;
 use RuntimeException;
-use Timeax\ConfigSchema\Contracts\ConfigFieldValidator;
-use Timeax\ConfigSchema\Contracts\ConfigSchemaRepository;
-use Timeax\ConfigSchema\Contracts\HandlerTargetResolver;
-use Timeax\ConfigSchema\Contracts\ProvidesConfigSchema;
-use Timeax\ConfigSchema\Schema\UiConfigSchema;
-use Timeax\ConfigSchema\Support\ConfigBag;
-use Timeax\ConfigSchema\Support\ConfigValidationError;
+use Timeax\ConfigKit\Contracts\ConfigFieldValidator;
+use Timeax\ConfigKit\Contracts\ConfigSchemaRepository;
+use Timeax\ConfigKit\Contracts\HandlerTargetResolver;
+use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
+use Timeax\ConfigKit\Schema\UiConfigSchema;
+use Timeax\ConfigKit\Support\ConfigBag;
+use Timeax\ConfigKit\Support\ConfigValidationError;
 
 final readonly class ConfigSchemaService
 {

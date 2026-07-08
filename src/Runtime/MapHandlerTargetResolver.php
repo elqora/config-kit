@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Runtime;
+namespace Timeax\ConfigKit\Runtime;
 
 use InvalidArgumentException;
-use Timeax\ConfigSchema\Contracts\HandlerTargetResolver;
+use Timeax\ConfigKit\Contracts\HandlerTargetResolver;
 
 final readonly class MapHandlerTargetResolver implements HandlerTargetResolver
 {

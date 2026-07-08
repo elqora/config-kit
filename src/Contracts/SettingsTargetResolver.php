@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Contracts;
+namespace Timeax\ConfigKit\Contracts;
 
-use Timeax\ConfigSchema\Runtime\SettingsTarget;
+use Timeax\ConfigKit\Runtime\SettingsTarget;
 
 interface SettingsTargetResolver
 {

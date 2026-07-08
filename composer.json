@@ -1,11 +1,11 @@
 {
-    "name": "timeax/ui-config-schema",
+    "name": "timeax/config-kit",
     "description": "SDK config schema designed to provide a general shape for Input field configurations",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Timeax\\ConfigSchema\\": "src/"
+            "Timeax\\ConfigKit\\": "src/"
         }
     },
     "authors": [
@@ -20,7 +20,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Timeax\\ConfigSchema\\Tests\\": "tests/"
+            "Timeax\\ConfigKit\\Tests\\": "tests/"
         }
     },
     "scripts": {
