@@ -1,120 +1,112 @@
-````md
 # Timeax UI Config Schema
 
-Portable, framework-agnostic primitives for describing **UI configuration forms** (fields, options, rules, secrets) and
-returning **structured validation results**.
+Framework-agnostic PHP primitives for describing UI configuration forms.
 
-This package is meant to be shared across SDKs and host apps so they can expose a consistent “config UI schema” without
-coupling to any specific UI framework (React/Vue/etc.) or product domain (payments, plugins, etc.).
+This package gives SDKs, plugins, admin panels, and host applications a shared
+way to describe configuration fields, option lists, nested groups, tabs,
+sensitive values, and validation results without coupling the schema to a
+specific frontend framework.
 
-It supports both:
-
-- **Flat schemas** (classic `ConfigSchema` → `ConfigField[]`)
-- **Forti-style nested schemas** (tree: `UiConfigSchema` → `settings: { key: ConfigNode }` with `ConfigGroup` +
-  `ConfigField`)
-
----
+Use it when you want a PHP package to expose a predictable configuration
+contract that another system can render, validate, store, or transform.
 
 ## Installation
 
 ```bash
 composer require timeax/ui-config-schema
-````
+```
 
----
+The package is published as `timeax/ui-config-schema` and uses the
+`Timeax\ConfigSchema\` namespace.
 
-## What this package provides
+## What This Package Provides
 
-### Forti-style tree schema
+### Nested UI Schemas
 
-* **`UiConfigSchema`**: root container with `settings: array<string, ConfigNode>`
-* **`ConfigTab`**: optional UI tab metadata (`id`, `label`, `parentId`, `includes`, `excludes`)
-* **`ConfigNode`**: node interface (either a group or a field)
-* **`ConfigGroup`**: a group node containing `children: array<string, ConfigNode>`
-* **`ConfigField`**: a field node (leaf) — also implements `ConfigNode`
+Use `UiConfigSchema` when you want to describe a tree-shaped form:
 
-### Flat schema (backwards-compatible)
+- `UiConfigSchema` is the root object.
+- `settings` is an associative array of named schema nodes.
+- `ConfigGroup` represents a group of child nodes.
+- `ConfigField` represents an individual field.
+- `ConfigTab` describes optional tab metadata that a UI can use for layout.
 
-* **`ConfigSchema`**: a list of `ConfigField` objects
+Nested schemas are useful when your UI naturally has grouped settings, such as
+credentials, webhook options, or advanced controls.
+
+### Flat Schemas
+
+Use `ConfigSchema` when you want a simple list of `ConfigField` objects.
+
+Flat schemas are useful for older integrations, simple forms, or storage flows
+that do not need nested layout information.
 
 ### Options
 
-* **`ConfigOption`**: discrete option values for selects/radios/multiselect, etc.
+Use `ConfigOption` for select, radio, multiselect, or button-like choices.
+Options can include or exclude other fields, and they can also have nested child
+options.
 
-### Config values container
+### Config Values
 
-* **`ConfigBag`**: holds `options` + `secrets`, supports looking up values and filtering by schema (secrets excluded
-  from default serialization)
+Use `ConfigBag` to pass actual configuration values around. It separates public
+options from sensitive secrets and intentionally excludes secrets from default
+serialization.
 
-### Validation results
+### Validation Results
 
-* **`ConfigValidationResult`**: consistent shape for validation outcomes + field errors
-* **`ConfigValidationError`**: a single field-level error record
+Use `ConfigValidationResult` and `ConfigValidationError` to return structured
+field-level validation feedback from providers or host applications.
 
-### Optional contract
+### Provider Contract
 
-* **`ProvidesConfigSchema`**: a tiny interface for anything that can expose a schema
+Use `ProvidesConfigSchema` when a provider, service, plugin, or integration
+needs to expose its schema, validate config, return public config, and redact
+sensitive payloads.
 
----
+### Optional Runtime Layer
 
-## Included JSON Schema
+Use the runtime classes when you want this package to also orchestrate schema
+storage, frontend payloads, named settings providers, handler targets, and
+profile/sandbox flows. The runtime is still framework-agnostic: applications
+provide storage, validation, encryption, and handler discovery through adapters.
 
-This repository ships a Draft-07 JSON Schema that mirrors the Forti-style structure:
+## Core Concepts
 
-* `schema/timeax.ui-config-schema.draft-07.json`
+The package separates schema definitions from stored values:
 
-It validates objects shaped like:
+- Schema classes describe what a UI should render.
+- `ConfigBag` carries submitted or stored values.
+- Validation result classes describe whether a config is usable.
+- The JSON Schema file validates serialized nested schema payloads.
 
-```json
-{
-  "settings": {
-    "gateway": {
-      "type": "group",
-      "label": "Gateway",
-      "children": {
-        "public_key": {
-          "label": "Public Key",
-          "type": "text",
-          "required": true
-        },
-        "secret_key": {
-          "label": "Secret Key",
-          "type": "password",
-          "required": true,
-          "secret": true
-        }
-      }
-    }
-  }
-}
-```
+Fields can be marked as secret, sandbox-only, live-only, required, tab-bound, or
+controlled by option visibility rules.
 
----
-
-## Quick examples
-
-### 1) Define a Forti-style tree schema
+## Nested UI Schema Example
 
 ```php
 <?php
 
 use Timeax\ConfigSchema\Schema\ConfigField;
 use Timeax\ConfigSchema\Schema\ConfigGroup;
-use Timeax\ConfigSchema\Schema\UiConfigSchema;
 use Timeax\ConfigSchema\Schema\ConfigOption;
 use Timeax\ConfigSchema\Schema\ConfigTab;
+use Timeax\ConfigSchema\Schema\UiConfigSchema;
 
 $schema = new UiConfigSchema(
     settings: [
-        'gateway' => new ConfigGroup(
-            label: 'Gateway',
-            tabs: ['payments'],
+        'credentials' => new ConfigGroup(
+            label: 'Credentials',
+            tabs: ['connection'],
             children: [
                 'public_key' => new ConfigField(
                     name: 'public_key',
                     label: 'Public Key',
+                    type: 'text',
                     required: true,
-                    tabs: ['payments'],
+                    helpText: 'Your publishable API key.',
+                    tabs: ['connection'],
                 ),
                 'secret_key' => new ConfigField(
                     name: 'secret_key',
@@ -122,57 +114,293 @@ $schema = new UiConfigSchema(
                     type: 'password',
                     required: true,
                     secret: true,
-                    tabs: ['payments'],
+                    helpText: 'Stored securely by the host application.',
+                    tabs: ['connection'],
                 ),
             ],
         ),
-        'mode' => new ConfigField(
-            name: 'mode',
-            label: 'Mode',
+        'payment_method' => new ConfigField(
+            name: 'payment_method',
+            label: 'Payment Method',
             type: 'select',
             required: true,
+            default: 'card',
             isButton: true,
-            includes: ['gateway'],
+            tabs: ['checkout'],
             options: [
-                new ConfigOption('card', 'Card', id: 'mode_card', includes: ['public_key']),
-                new ConfigOption('bank', 'Bank Transfer', id: 'mode_bank', includes: ['secret_key']),
+                new ConfigOption(
+                    value: 'card',
+                    label: 'Card',
+                    id: 'payment_card',
+                    includes: ['card_statement_descriptor'],
+                ),
+                new ConfigOption(
+                    value: 'bank_transfer',
+                    label: 'Bank Transfer',
+                    id: 'payment_bank_transfer',
+                    includes: ['bank_account_name'],
+                ),
             ],
+        ),
+        'card_statement_descriptor' => new ConfigField(
+            name: 'card_statement_descriptor',
+            label: 'Card Statement Descriptor',
+            type: 'text',
+            tabs: ['checkout'],
+        ),
+        'bank_account_name' => new ConfigField(
+            name: 'bank_account_name',
+            label: 'Bank Account Name',
+            type: 'text',
+            tabs: ['checkout'],
         ),
     ],
     tabs: [
-        new ConfigTab(id: 'payments', label: 'Payments'),
-        new ConfigTab(id: 'advanced', label: 'Advanced', parentId: 'payments'),
+        new ConfigTab(id: 'connection', label: 'Connection'),
+        new ConfigTab(id: 'checkout', label: 'Checkout'),
     ],
 );
+
+$payload = $schema->jsonSerialize();
 ```
 
-### 2) Flatten a tree schema into a flat schema
+The serialized shape is designed to be easy for frontends and other services to
+consume:
 
-`flatten()` traverses the tree and returns a `ConfigSchema(fields[])`.
+```json
+{
+  "settings": {
+    "credentials": {
+      "type": "group",
+      "label": "Credentials",
+      "required": false,
+      "children": {
+        "public_key": {
+          "name": "public_key",
+          "label": "Public Key",
+          "type": "text",
+          "required": true,
+          "secret": false
+        }
+      }
+    }
+  },
+  "tabs": [
+    {
+      "id": "connection",
+      "label": "Connection",
+      "parentId": null
+    }
+  ]
+}
+```
 
-It also stamps each field with its `group` path so the structure can be rebuilt later.
+## Flat Schema Example
 
 ```php
 <?php
 
-$flat = $schema->flatten();
+use Timeax\ConfigSchema\Schema\ConfigField;
+use Timeax\ConfigSchema\Schema\ConfigOption;
+use Timeax\ConfigSchema\Schema\ConfigSchema;
 
-// ConfigSchema { fields: ConfigField[] }
-// Each field may carry ->group (e.g. "gateway")
+$schema = new ConfigSchema([
+    new ConfigField(
+        name: 'mode',
+        label: 'Mode',
+        type: 'select',
+        required: true,
+        options: [
+            new ConfigOption('test', 'Test'),
+            new ConfigOption('live', 'Live'),
+        ],
+    ),
+    new ConfigField(
+        name: 'webhook_url',
+        label: 'Webhook URL',
+        type: 'url',
+        rules: ['nullable', 'url'],
+        helpText: 'The endpoint that receives provider events.',
+    ),
+]);
+
+$payload = $schema->jsonSerialize();
 ```
 
-### 3) Rebuild a Forti-style tree from a flat schema
+## Converting Between Nested and Flat Schemas
+
+You can flatten a nested schema into a `ConfigSchema`:
 
 ```php
 <?php
 
 use Timeax\ConfigSchema\Schema\ConfigSchema;
+use Timeax\ConfigSchema\Schema\UiConfigSchema;
 
-/** @var ConfigSchema $flat */
-$tree = $flat->toUiConfigSchema();
+/** @var UiConfigSchema $uiSchema */
+$flatSchema = $uiSchema->flatten();
+
+// $flatSchema is an instance of ConfigSchema.
+// Fields under root groups receive a group value like "credentials".
 ```
 
-### 4) Store config values with options + secrets
+You can also rebuild a nested schema from a flat schema:
+
+```php
+<?php
+
+use Timeax\ConfigSchema\Schema\ConfigSchema;
+use Timeax\ConfigSchema\Schema\UiConfigSchema;
+
+/** @var ConfigSchema $flatSchema */
+$uiSchema = $flatSchema->toUiConfigSchema();
+
+// Fields with group paths are placed back under ConfigGroup nodes.
+```
+
+Use the optional sandbox argument when flattening a nested schema:
+
+```php
+<?php
+
+$allFields = $uiSchema->flatten();
+$testFields = $uiSchema->flatten(sandbox: true);
+$liveFields = $uiSchema->flatten(sandbox: false);
+```
+
+## Tabs, Includes, Excludes, and Button-Like Options
+
+Tabs and visibility hints are intentionally plain data. The package does not
+decide how a UI renders them; it exposes enough structure for your frontend or
+host application to make that decision.
+
+```php
+<?php
+
+use Timeax\ConfigSchema\Schema\ConfigField;
+use Timeax\ConfigSchema\Schema\ConfigOption;
+use Timeax\ConfigSchema\Schema\ConfigTab;
+
+$tabs = [
+    new ConfigTab(id: 'basic', label: 'Basic'),
+    new ConfigTab(id: 'advanced', label: 'Advanced', parentId: 'basic'),
+];
+
+$field = new ConfigField(
+    name: 'checkout_type',
+    label: 'Checkout Type',
+    type: 'radio',
+    tabs: ['basic'],
+    isButton: true,
+    options: [
+        new ConfigOption(
+            value: 'hosted',
+            label: 'Hosted Checkout',
+            includes: ['success_url', 'cancel_url'],
+            excludes: ['embedded_theme'],
+        ),
+        new ConfigOption(
+            value: 'embedded',
+            label: 'Embedded Checkout',
+            includes: ['embedded_theme'],
+            excludes: ['success_url', 'cancel_url'],
+        ),
+    ],
+);
+```
+
+Common conventions:
+
+- `tabs` lists tab IDs where a group or field belongs.
+- `includes` lists related field or group keys that should be shown.
+- `excludes` lists related field or group keys that should be hidden.
+- `isButton` lets a renderer display select/radio options as button-like
+  choices.
+
+## Lazy Options and Nested Option Children
+
+`ConfigField::$options` can be an array of `ConfigOption` objects or a closure
+that returns an array of `ConfigOption` objects. Closures are resolved only when
+options are serialized or explicitly resolved.
+
+```php
+<?php
+
+use Timeax\ConfigSchema\Schema\ConfigField;
+use Timeax\ConfigSchema\Schema\ConfigOption;
+
+$field = new ConfigField(
+    name: 'currency',
+    label: 'Currency',
+    type: 'select',
+    options: static fn (): array => [
+        new ConfigOption('usd', 'USD'),
+        new ConfigOption('eur', 'EUR'),
+        new ConfigOption('gbp', 'GBP'),
+    ],
+);
+
+$options = $field->resolveOptions();
+```
+
+`ConfigOption::$children` works the same way. This is useful for nested choices:
+
+```php
+<?php
+
+use Timeax\ConfigSchema\Schema\ConfigOption;
+
+$option = new ConfigOption(
+    value: 'bank_transfer',
+    label: 'Bank Transfer',
+    children: [
+        new ConfigOption('domestic', 'Domestic Transfer'),
+        new ConfigOption('international', 'International Transfer'),
+    ],
+);
+
+$children = $option->resolveChildren();
+```
+
+If an options or children resolver returns anything other than an array of
+`ConfigOption` objects, the package throws an `InvalidArgumentException`.
+
+## Sandbox and Live Configuration
+
+Fields can be scoped to sandbox or live mode with the `sandbox` flag.
+
+```php
+<?php
+
+use Timeax\ConfigSchema\Schema\ConfigField;
+use Timeax\ConfigSchema\Schema\ConfigSchema;
+
+$schema = new ConfigSchema([
+    new ConfigField(
+        name: 'test_secret_key',
+        label: 'Test Secret Key',
+        type: 'password',
+        secret: true,
+        sandbox: true,
+    ),
+    new ConfigField(
+        name: 'live_secret_key',
+        label: 'Live Secret Key',
+        type: 'password',
+        secret: true,
+        sandbox: false,
+    ),
+]);
+
+$testSchema = $schema->forTest();
+$liveSchema = $schema->forLive();
+
+$testKeys = $schema->keysForSandbox(true);
+$liveKeys = $schema->keysForSandbox(false);
+```
+
+You can filter a `ConfigBag` to keep only the values declared for the bag's
+current mode:
 
 ```php
 <?php
@@ -182,47 +410,519 @@ use Timeax\ConfigSchema\Support\ConfigBag;
 $config = new ConfigBag(
     sandbox: true,
     options: [
-        'mode' => 'card',
-        'public_key' => 'pk_test_...',
+        'enabled' => true,
+        'test_secret_key' => 'sk_test_...',
+        'live_secret_key' => 'sk_live_...',
+    ],
+    secrets: [
+        'test_secret_key' => 'sk_test_...',
+        'live_secret_key' => 'sk_live_...',
+    ],
+);
+
+$filtered = $config->filterBySchema($schema);
+```
+
+## Config Values and Secrets
+
+`ConfigBag` stores public options separately from secrets.
+
+```php
+<?php
+
+use Timeax\ConfigSchema\Support\ConfigBag;
+
+$config = new ConfigBag(
+    sandbox: true,
+    options: [
+        'payment_method' => 'card',
+        'webhook_url' => 'https://example.com/webhooks/provider',
     ],
     secrets: [
         'secret_key' => 'sk_test_...',
     ],
 );
 
-// secrets are excluded from jsonSerialize by default
-$public = $config->jsonSerialize();
+$method = $config->option('payment_method');
+$webhookUrl = $config->filledOption('webhook_url');
+$secretKey = $config->secret('secret_key');
+
+$publicPayload = $config->jsonSerialize();
+$alsoPublic = $config->toPublicArray();
 ```
 
-### 5) Validation result example
+Both `jsonSerialize()` and `toPublicArray()` exclude secrets:
+
+```json
+{
+  "sandbox": true,
+  "options": {
+    "payment_method": "card",
+    "webhook_url": "https://example.com/webhooks/provider"
+  }
+}
+```
+
+Mark sensitive schema fields with `secret: true`, then keep their submitted
+values in `ConfigBag::$secrets`.
+
+## Validation Results
+
+Use `ConfigValidationResult::ok()` for valid config and
+`ConfigValidationResult::fail([...])` for invalid config.
 
 ```php
 <?php
 
+use Timeax\ConfigSchema\Support\ConfigBag;
 use Timeax\ConfigSchema\Support\ConfigValidationResult;
 
-$result = ConfigValidationResult::fail()
-    ->addError('public_key', 'Required')
-    ->addError('secret_key', 'Required');
+function validateProviderConfig(ConfigBag $config): ConfigValidationResult
+{
+    $errors = [];
+
+    if ($config->filledOption('payment_method') === null) {
+        $errors['payment_method'][] = 'Choose a payment method.';
+    }
+
+    if ($config->secret('secret_key') === null) {
+        $errors['secret_key'][] = 'Enter a secret key.';
+    }
+
+    if ($errors !== []) {
+        return ConfigValidationResult::fail($errors)
+            ->addError('credentials', 'Configuration is incomplete.', 'missing_credentials');
+    }
+
+    return ConfigValidationResult::ok();
+}
+
+$result = validateProviderConfig($config);
 
 if (! $result->isOk()) {
     return $result->jsonSerialize();
 }
 ```
 
----
+Serialized validation errors are grouped by field:
 
-## Notes on secrets
+```json
+{
+  "ok": false,
+  "errors": {
+    "secret_key": [
+      {
+        "field": "secret_key",
+        "message": "Enter a secret key.",
+        "code": null
+      }
+    ]
+  }
+}
+```
 
-* `ConfigBag::jsonSerialize()` intentionally excludes secrets.
-* Use `ConfigField::$secret = true` to mark a field as sensitive.
-* Hosts should still enforce secret-handling (mask in UI, avoid logs, encrypt at rest if desired).
+## Provider Contract Example
 
----
+Implement `ProvidesConfigSchema` when an integration needs to expose schema and
+runtime config helpers through a consistent interface.
+
+```php
+<?php
+
+use Timeax\ConfigSchema\Contracts\ProvidesConfigSchema;
+use Timeax\ConfigSchema\Schema\ConfigField;
+use Timeax\ConfigSchema\Schema\ConfigGroup;
+use Timeax\ConfigSchema\Schema\ConfigSchema;
+use Timeax\ConfigSchema\Schema\UiConfigSchema;
+use Timeax\ConfigSchema\Support\ConfigBag;
+use Timeax\ConfigSchema\Support\ConfigValidationResult;
+
+final class PaymentProvider implements ProvidesConfigSchema
+{
+    public function configSchema(): ?ConfigSchema
+    {
+        return $this->uiConfigSchema()?->flatten();
+    }
+
+    public function uiConfigSchema(): ?UiConfigSchema
+    {
+        return new UiConfigSchema([
+            'credentials' => new ConfigGroup(
+                label: 'Credentials',
+                children: [
+                    'public_key' => new ConfigField(
+                        name: 'public_key',
+                        label: 'Public Key',
+                        required: true,
+                    ),
+                    'secret_key' => new ConfigField(
+                        name: 'secret_key',
+                        label: 'Secret Key',
+                        type: 'password',
+                        required: true,
+                        secret: true,
+                    ),
+                ],
+            ),
+        ]);
+    }
+
+    public function validateConfig(?ConfigBag $config = null): ConfigValidationResult
+    {
+        if ($config === null || $config->secret('secret_key') === null) {
+            return ConfigValidationResult::fail([
+                'secret_key' => ['Enter a secret key.'],
+            ]);
+        }
+
+        return ConfigValidationResult::ok();
+    }
+
+    public function publicConfig(?ConfigBag $config = null): array
+    {
+        return $config?->toPublicArray() ?? [];
+    }
+
+    public function redactForLogs(mixed $payload): mixed
+    {
+        if (! is_array($payload)) {
+            return $payload;
+        }
+
+        if (array_key_exists('secret_key', $payload)) {
+            $payload['secret_key'] = '[redacted]';
+        }
+
+        return $payload;
+    }
+}
+```
+
+## Optional Runtime Layer
+
+The runtime layer is for hosts that want reusable config orchestration instead
+of only schema objects.
+
+The SDK provides:
+
+- `ConfigSchemaService` for settings payloads, apply flows, profiles, and
+  default-profile changes.
+- `ConfigSchemaStore` for frontend-safe nested settings payloads and candidate
+  value application.
+- `ConfigSchemaRepository` as the storage boundary.
+- `ConfigFieldValidator` as the field-rule validation boundary.
+- `HandlerTargetResolver` and `MapHandlerTargetResolver` for handler-key to
+  target/provider resolution.
+
+The SDK does not ship a database implementation. A host application maps its own
+storage records to `ConfigSchemaRecord` and handles encryption before values
+enter or leave the repository adapter.
+
+## Named Settings Providers
+
+DGP-style settings providers are supported through `SettingsContract`. It
+extends `ProvidesConfigSchema` and adds a stable settings name.
+
+```php
+<?php
+
+use Timeax\ConfigSchema\Contracts\SettingsContract;
+use Timeax\ConfigSchema\Schema\ConfigField;
+use Timeax\ConfigSchema\Schema\ConfigSchema;
+use Timeax\ConfigSchema\Schema\UiConfigSchema;
+use Timeax\ConfigSchema\Support\ConfigBag;
+use Timeax\ConfigSchema\Support\ConfigValidationResult;
+
+final class TwoFactorSettings implements SettingsContract
+{
+    public function name(): string
+    {
+        return 'two-factor';
+    }
+
+    public function uiConfigSchema(): ?UiConfigSchema
+    {
+        return new UiConfigSchema([
+            'issuer' => new ConfigField(
+                name: 'issuer',
+                label: 'OTP Issuer',
+                default: 'My App',
+            ),
+            'remember_minutes' => new ConfigField(
+                name: 'remember_minutes',
+                label: 'Remember Minutes',
+                type: 'number',
+                default: 43200,
+            ),
+        ]);
+    }
+
+    public function configSchema(): ?ConfigSchema
+    {
+        return $this->uiConfigSchema()?->flatten();
+    }
+
+    public function validateConfig(?ConfigBag $config = null): ConfigValidationResult
+    {
+        return ConfigValidationResult::ok();
+    }
+
+    public function publicConfig(?ConfigBag $config = null): array
+    {
+        $config ??= new ConfigBag();
+
+        return [
+            'otp' => [
+                'issuer' => (string) $config->option('issuer', 'My App'),
+            ],
+            'remember_device' => [
+                'minutes' => (int) $config->option('remember_minutes', 43200),
+            ],
+        ];
+    }
+
+    public function redactForLogs(mixed $payload): mixed
+    {
+        return $payload;
+    }
+}
+```
+
+Register providers explicitly:
+
+```php
+<?php
+
+use Timeax\ConfigSchema\Runtime\ConfigSchemaService;
+use Timeax\ConfigSchema\Runtime\SettingsManager;
+use Timeax\ConfigSchema\Runtime\SettingsProviderRegistry;
+
+$registry = new SettingsProviderRegistry([
+    new TwoFactorSettings(),
+]);
+
+$settings = new SettingsManager(
+    providers: $registry,
+    repository: $repository,
+    schemas: new ConfigSchemaService($repository),
+);
+```
+
+Read settings with dot-path access:
+
+```php
+<?php
+
+$twoFactor = $settings->get('two-factor');
+
+$issuer = $twoFactor->get('otp.issuer', 'Fallback App');
+$minutes = $twoFactor->get('remember_device.minutes', 43200);
+$all = $twoFactor->all();
+```
+
+Apply settings through the provider schema and validation flow:
+
+```php
+<?php
+
+$updated = $settings->get('two-factor')->apply([
+    'issuer' => 'Production App',
+    'remember_minutes' => 10080,
+]);
+
+$updated = $updated->set('issuer', 'Admin Portal');
+```
+
+Profiles and sandbox mode are supported:
+
+```php
+<?php
+
+$profile = $settings->apply(
+    name: 'two-factor',
+    values: ['issuer' => 'Tenant A'],
+    profile: 'tenant-a',
+    options: ['sandbox' => false, 'is_default' => true],
+);
+```
+
+By default, settings are stored under `targetType = "settings"` and
+`targetId = provider name`. Hosts can override that with `SettingsTargetResolver`.
+
+## Laravel Integration
+
+Laravel should provide adapters, not change the SDK internals.
+
+Bind the runtime contracts in a service provider:
+
+```php
+<?php
+
+use App\Support\ConfigSchema\LaravelConfigFieldValidator;
+use App\Support\ConfigSchema\LaravelConfigSchemaRepository;
+use App\Support\ConfigSchema\LaravelSettingsTargetResolver;
+use Timeax\ConfigSchema\Contracts\ConfigFieldValidator;
+use Timeax\ConfigSchema\Contracts\ConfigSchemaRepository;
+use Timeax\ConfigSchema\Contracts\HandlerTargetResolver;
+use Timeax\ConfigSchema\Contracts\SettingsTargetResolver;
+use Timeax\ConfigSchema\Runtime\ConfigSchemaService;
+use Timeax\ConfigSchema\Runtime\MapHandlerTargetResolver;
+use Timeax\ConfigSchema\Runtime\SettingsManager;
+use Timeax\ConfigSchema\Runtime\SettingsProviderRegistry;
+
+$this->app->bind(ConfigSchemaRepository::class, LaravelConfigSchemaRepository::class);
+$this->app->bind(ConfigFieldValidator::class, LaravelConfigFieldValidator::class);
+$this->app->bind(SettingsTargetResolver::class, LaravelSettingsTargetResolver::class);
+
+$this->app->bind(HandlerTargetResolver::class, function () {
+    return new MapHandlerTargetResolver(config('config-schema.handlers', []));
+});
+
+$this->app->bind(ConfigSchemaService::class, function ($app) {
+    return new ConfigSchemaService(
+        repository: $app->make(ConfigSchemaRepository::class),
+        handlerResolver: $app->make(HandlerTargetResolver::class),
+        validator: $app->make(ConfigFieldValidator::class),
+    );
+});
+
+$this->app->bind(SettingsManager::class, function ($app) {
+    return new SettingsManager(
+        providers: new SettingsProviderRegistry([
+            $app->make(\App\Settings\Security\TwoFactorSettings::class),
+        ]),
+        repository: $app->make(ConfigSchemaRepository::class),
+        schemas: $app->make(ConfigSchemaService::class),
+        targetResolver: $app->make(SettingsTargetResolver::class),
+    );
+});
+```
+
+A Laravel repository adapter should:
+
+- Read/write your `config_schemas` table.
+- Encrypt/decrypt secrets before mapping to `ConfigSchemaRecord`.
+- Map timestamps and health payloads if the host uses them.
+- Implement default-profile behavior with normal database queries.
+
+A Laravel field validator adapter should wrap `Validator::make($data, $rules)`
+and return `ConfigValidationError` objects.
+
+A DGP-style settings target resolver can map provider names to `SiteConf`
+records:
+
+```php
+<?php
+
+use App\Models\SiteConf;
+use Timeax\ConfigSchema\Contracts\SettingsContract;
+use Timeax\ConfigSchema\Contracts\SettingsTargetResolver;
+use Timeax\ConfigSchema\Runtime\SettingsTarget;
+
+final class LaravelSettingsTargetResolver implements SettingsTargetResolver
+{
+    public function resolve(SettingsContract $provider): SettingsTarget
+    {
+        $conf = SiteConf::query()
+            ->where('name', $provider->name())
+            ->latest('id')
+            ->firstOrFail();
+
+        return new SettingsTarget(
+            targetId: (int) $conf->id,
+            targetType: $conf->getMorphClass(),
+            handlerKey: 'system',
+        );
+    }
+}
+```
+
+Handler definitions can stay in Laravel config:
+
+```php
+<?php
+
+use App\Models\PaymentGateway;
+use Timeax\ConfigSchema\Runtime\HandlerDefinition;
+
+return [
+    'handlers' => [
+        'gateway' => new HandlerDefinition(
+            key: 'gateway',
+            targetType: PaymentGateway::class,
+            loadTarget: static fn (int|string $id) => PaymentGateway::query()->findOrFail((int) $id),
+            makeDriver: static fn (PaymentGateway $gateway) => \PayKit\Pay::via($gateway->id, false),
+            resolveTargetId: static fn (PaymentGateway $gateway) => (int) $gateway->getKey(),
+            resolveTargetType: static fn (PaymentGateway $gateway) => $gateway->getMorphClass(),
+        ),
+    ],
+];
+```
+
+When adding runtime classes to this package, make sure the new files are
+committed or otherwise included in the installed package. Passing autoload tests
+locally is not enough if `src/Runtime` or new contract files are still
+untracked.
+
+## JSON Schema
+
+The repository includes a Draft-07 JSON Schema for validating serialized nested
+schema payloads:
+
+```text
+schema/timeax.ui-config-schema.draft-07.json
+```
+
+Use it when you need to validate schema JSON before sending it to a frontend,
+storing it, or accepting it from another service.
+
+Example serialized payload:
+
+```json
+{
+  "settings": {
+    "credentials": {
+      "type": "group",
+      "label": "Credentials",
+      "required": false,
+      "children": {
+        "public_key": {
+          "name": "public_key",
+          "label": "Public Key",
+          "type": "text",
+          "required": true,
+          "secret": false,
+          "rules": [],
+          "default": null,
+          "helpText": null,
+          "options": [],
+          "sandbox": false,
+          "meta": {},
+          "group": null,
+          "tabs": [],
+          "isButton": false,
+          "includes": [],
+          "excludes": []
+        }
+      },
+      "meta": {},
+      "tabs": [],
+      "includes": [],
+      "excludes": []
+    }
+  },
+  "tabs": []
+}
+```
+
+## Testing
+
+Run the test suite with Composer:
+
+```bash
+composer test
+```
 
 ## License
 
 MIT
-
-```
-```
