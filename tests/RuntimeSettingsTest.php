@@ -1,21 +1,21 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Tests;
+namespace Elqora\ConfigKit\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Timeax\ConfigKit\Contracts\SettingsContract;
-use Timeax\ConfigKit\Contracts\SettingsTargetResolver;
-use Timeax\ConfigKit\Runtime\ConfigSchemaRecord;
-use Timeax\ConfigKit\Runtime\ConfigSchemaService;
-use Timeax\ConfigKit\Runtime\SettingsManager;
-use Timeax\ConfigKit\Runtime\SettingsProviderRegistry;
-use Timeax\ConfigKit\Runtime\SettingsTarget;
-use Timeax\ConfigKit\Schema\ConfigField;
-use Timeax\ConfigKit\Schema\ConfigSchema;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
-use Timeax\ConfigKit\Support\ConfigBag;
-use Timeax\ConfigKit\Support\ConfigValidationResult;
+use Elqora\ConfigKit\Contracts\SettingsContract;
+use Elqora\ConfigKit\Contracts\SettingsTargetResolver;
+use Elqora\ConfigKit\Runtime\ConfigSchemaRecord;
+use Elqora\ConfigKit\Runtime\ConfigSchemaService;
+use Elqora\ConfigKit\Runtime\SettingsManager;
+use Elqora\ConfigKit\Runtime\SettingsProviderRegistry;
+use Elqora\ConfigKit\Runtime\SettingsTarget;
+use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigValidationResult;
 
 final class RuntimeSettingsTest extends TestCase
 {
@@ -144,7 +144,7 @@ final class RuntimeSettingsTest extends TestCase
             ]),
             repository: $repository,
             schemas: new ConfigSchemaService($repository),
-            targetResolver: $resolver ?? new \Timeax\ConfigKit\Runtime\DefaultSettingsTargetResolver(),
+            targetResolver: $resolver ?? new \Elqora\ConfigKit\Runtime\DefaultSettingsTargetResolver(),
         );
     }
 }

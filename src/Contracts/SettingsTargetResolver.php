@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Contracts;
+namespace Elqora\ConfigKit\Contracts;
 
-use Timeax\ConfigKit\Runtime\SettingsTarget;
+use Elqora\ConfigKit\Runtime\SettingsTarget;
 
 interface SettingsTargetResolver
 {

@@ -1,4 +1,4 @@
-# Timeax UI Config Schema
+# Elqora UI Config Schema
 
 Framework-agnostic PHP primitives for describing UI configuration forms.
 
@@ -13,11 +13,11 @@ contract that another system can render, validate, store, or transform.
 ## Installation
 
 ```bash
-composer require timeax/config-kit
+composer require elqora/config-kit
 ```
 
-The package is published as `timeax/config-kit` and uses the
-`Timeax\ConfigKit\` namespace.
+The package is published as `elqora/config-kit` and uses the
+`Elqora\ConfigKit\` namespace.
 
 ## What This Package Provides
 
@@ -88,11 +88,11 @@ controlled by option visibility rules.
 ```php
 <?php
 
-use Timeax\ConfigKit\Schema\ConfigField;
-use Timeax\ConfigKit\Schema\ConfigGroup;
-use Timeax\ConfigKit\Schema\ConfigOption;
-use Timeax\ConfigKit\Schema\ConfigTab;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigGroup;
+use Elqora\ConfigKit\Schema\ConfigOption;
+use Elqora\ConfigKit\Schema\ConfigTab;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
 
 $schema = new UiConfigSchema(
     settings: [
@@ -200,9 +200,9 @@ consume:
 ```php
 <?php
 
-use Timeax\ConfigKit\Schema\ConfigField;
-use Timeax\ConfigKit\Schema\ConfigOption;
-use Timeax\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigOption;
+use Elqora\ConfigKit\Schema\ConfigSchema;
 
 $schema = new ConfigSchema([
     new ConfigField(
@@ -234,8 +234,8 @@ You can flatten a nested schema into a `ConfigSchema`:
 ```php
 <?php
 
-use Timeax\ConfigKit\Schema\ConfigSchema;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
 
 /** @var UiConfigSchema $uiSchema */
 $flatSchema = $uiSchema->flatten();
@@ -249,8 +249,8 @@ You can also rebuild a nested schema from a flat schema:
 ```php
 <?php
 
-use Timeax\ConfigKit\Schema\ConfigSchema;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
 
 /** @var ConfigSchema $flatSchema */
 $uiSchema = $flatSchema->toUiConfigSchema();
@@ -277,9 +277,9 @@ host application to make that decision.
 ```php
 <?php
 
-use Timeax\ConfigKit\Schema\ConfigField;
-use Timeax\ConfigKit\Schema\ConfigOption;
-use Timeax\ConfigKit\Schema\ConfigTab;
+use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigOption;
+use Elqora\ConfigKit\Schema\ConfigTab;
 
 $tabs = [
     new ConfigTab(id: 'basic', label: 'Basic'),
@@ -326,8 +326,8 @@ options are serialized or explicitly resolved.
 ```php
 <?php
 
-use Timeax\ConfigKit\Schema\ConfigField;
-use Timeax\ConfigKit\Schema\ConfigOption;
+use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigOption;
 
 $field = new ConfigField(
     name: 'currency',
@@ -348,7 +348,7 @@ $options = $field->resolveOptions();
 ```php
 <?php
 
-use Timeax\ConfigKit\Schema\ConfigOption;
+use Elqora\ConfigKit\Schema\ConfigOption;
 
 $option = new ConfigOption(
     value: 'bank_transfer',
@@ -372,8 +372,8 @@ Fields can be scoped to sandbox or live mode with the `sandbox` flag.
 ```php
 <?php
 
-use Timeax\ConfigKit\Schema\ConfigField;
-use Timeax\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigSchema;
 
 $schema = new ConfigSchema([
     new ConfigField(
@@ -405,7 +405,7 @@ current mode:
 ```php
 <?php
 
-use Timeax\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigBag;
 
 $config = new ConfigBag(
     sandbox: true,
@@ -430,7 +430,7 @@ $filtered = $config->filterBySchema($schema);
 ```php
 <?php
 
-use Timeax\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigBag;
 
 $config = new ConfigBag(
     sandbox: true,
@@ -474,8 +474,8 @@ Use `ConfigValidationResult::ok()` for valid config and
 ```php
 <?php
 
-use Timeax\ConfigKit\Support\ConfigBag;
-use Timeax\ConfigKit\Support\ConfigValidationResult;
+use Elqora\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigValidationResult;
 
 function validateProviderConfig(ConfigBag $config): ConfigValidationResult
 {
@@ -529,13 +529,13 @@ runtime config helpers through a consistent interface.
 ```php
 <?php
 
-use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
-use Timeax\ConfigKit\Schema\ConfigField;
-use Timeax\ConfigKit\Schema\ConfigGroup;
-use Timeax\ConfigKit\Schema\ConfigSchema;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
-use Timeax\ConfigKit\Support\ConfigBag;
-use Timeax\ConfigKit\Support\ConfigValidationResult;
+use Elqora\ConfigKit\Contracts\ProvidesConfigSchema;
+use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigGroup;
+use Elqora\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigValidationResult;
 
 final class PaymentProvider implements ProvidesConfigSchema
 {
@@ -626,12 +626,12 @@ extends `ProvidesConfigSchema` and adds a stable settings name.
 ```php
 <?php
 
-use Timeax\ConfigKit\Contracts\SettingsContract;
-use Timeax\ConfigKit\Schema\ConfigField;
-use Timeax\ConfigKit\Schema\ConfigSchema;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
-use Timeax\ConfigKit\Support\ConfigBag;
-use Timeax\ConfigKit\Support\ConfigValidationResult;
+use Elqora\ConfigKit\Contracts\SettingsContract;
+use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigValidationResult;
 
 final class TwoFactorSettings implements SettingsContract
 {
@@ -693,9 +693,9 @@ Register providers explicitly:
 ```php
 <?php
 
-use Timeax\ConfigKit\Runtime\ConfigSchemaService;
-use Timeax\ConfigKit\Runtime\SettingsManager;
-use Timeax\ConfigKit\Runtime\SettingsProviderRegistry;
+use Elqora\ConfigKit\Runtime\ConfigSchemaService;
+use Elqora\ConfigKit\Runtime\SettingsManager;
+use Elqora\ConfigKit\Runtime\SettingsProviderRegistry;
 
 $registry = new SettingsProviderRegistry([
     new TwoFactorSettings(),
@@ -761,14 +761,14 @@ Bind the runtime contracts in a service provider:
 use App\Support\ConfigSchema\LaravelConfigFieldValidator;
 use App\Support\ConfigSchema\LaravelConfigSchemaRepository;
 use App\Support\ConfigSchema\LaravelSettingsTargetResolver;
-use Timeax\ConfigKit\Contracts\ConfigFieldValidator;
-use Timeax\ConfigKit\Contracts\ConfigSchemaRepository;
-use Timeax\ConfigKit\Contracts\HandlerTargetResolver;
-use Timeax\ConfigKit\Contracts\SettingsTargetResolver;
-use Timeax\ConfigKit\Runtime\ConfigSchemaService;
-use Timeax\ConfigKit\Runtime\MapHandlerTargetResolver;
-use Timeax\ConfigKit\Runtime\SettingsManager;
-use Timeax\ConfigKit\Runtime\SettingsProviderRegistry;
+use Elqora\ConfigKit\Contracts\ConfigFieldValidator;
+use Elqora\ConfigKit\Contracts\ConfigSchemaRepository;
+use Elqora\ConfigKit\Contracts\HandlerTargetResolver;
+use Elqora\ConfigKit\Contracts\SettingsTargetResolver;
+use Elqora\ConfigKit\Runtime\ConfigSchemaService;
+use Elqora\ConfigKit\Runtime\MapHandlerTargetResolver;
+use Elqora\ConfigKit\Runtime\SettingsManager;
+use Elqora\ConfigKit\Runtime\SettingsProviderRegistry;
 
 $this->app->bind(ConfigSchemaRepository::class, LaravelConfigSchemaRepository::class);
 $this->app->bind(ConfigFieldValidator::class, LaravelConfigFieldValidator::class);
@@ -815,9 +815,9 @@ records:
 <?php
 
 use App\Models\SiteConf;
-use Timeax\ConfigKit\Contracts\SettingsContract;
-use Timeax\ConfigKit\Contracts\SettingsTargetResolver;
-use Timeax\ConfigKit\Runtime\SettingsTarget;
+use Elqora\ConfigKit\Contracts\SettingsContract;
+use Elqora\ConfigKit\Contracts\SettingsTargetResolver;
+use Elqora\ConfigKit\Runtime\SettingsTarget;
 
 final class LaravelSettingsTargetResolver implements SettingsTargetResolver
 {
@@ -843,7 +843,7 @@ Handler definitions can stay in Laravel config:
 <?php
 
 use App\Models\PaymentGateway;
-use Timeax\ConfigKit\Runtime\HandlerDefinition;
+use Elqora\ConfigKit\Runtime\HandlerDefinition;
 
 return [
     'handlers' => [
@@ -870,7 +870,7 @@ The repository includes a Draft-07 JSON Schema for validating serialized nested
 schema payloads:
 
 ```text
-schema/timeax.ui-config-schema.draft-07.json
+schema/elqora.ui-config-schema.draft-07.json
 ```
 
 Use it when you need to validate schema JSON before sending it to a frontend,

@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Runtime;
+namespace Elqora\ConfigKit\Runtime;
 
-use Timeax\ConfigKit\Contracts\ConfigFieldValidator;
+use Elqora\ConfigKit\Contracts\ConfigFieldValidator;
 
 final class NoopConfigFieldValidator implements ConfigFieldValidator
 {

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/timeax/ui-config-schema/refs/heads/main/schema/timeax.ui-config-schema.draft-07.json",
+  "$id": "https://raw.githubusercontent.com/elqora/config-kit/refs/heads/main/schema/elqora.ui-config-schema.draft-07.json",
   "title": "ConfigSchema",
   "type": "object",
   "properties": {

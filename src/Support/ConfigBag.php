@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Support;
+namespace Elqora\ConfigKit\Support;
 
 use JsonSerializable;
-use Timeax\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\ConfigSchema;
 
 readonly class ConfigBag implements JsonSerializable
 {

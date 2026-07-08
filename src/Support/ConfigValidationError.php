@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Support;
+namespace Elqora\ConfigKit\Support;
 
 use JsonSerializable;
 

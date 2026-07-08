@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Runtime;
+namespace Elqora\ConfigKit\Runtime;
 
 use InvalidArgumentException;
-use Timeax\ConfigKit\Contracts\HandlerTargetResolver;
+use Elqora\ConfigKit\Contracts\HandlerTargetResolver;
 
 final readonly class MapHandlerTargetResolver implements HandlerTargetResolver
 {

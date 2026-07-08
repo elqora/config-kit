@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Runtime;
+namespace Elqora\ConfigKit\Runtime;
 
 use InvalidArgumentException;
 use RuntimeException;
-use Timeax\ConfigKit\Contracts\ConfigFieldValidator;
-use Timeax\ConfigKit\Contracts\ConfigSchemaRepository;
-use Timeax\ConfigKit\Contracts\HandlerTargetResolver;
-use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
-use Timeax\ConfigKit\Support\ConfigBag;
-use Timeax\ConfigKit\Support\ConfigValidationError;
+use Elqora\ConfigKit\Contracts\ConfigFieldValidator;
+use Elqora\ConfigKit\Contracts\ConfigSchemaRepository;
+use Elqora\ConfigKit\Contracts\HandlerTargetResolver;
+use Elqora\ConfigKit\Contracts\ProvidesConfigSchema;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigValidationError;
 
 final readonly class ConfigSchemaService
 {

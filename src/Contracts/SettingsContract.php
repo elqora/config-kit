@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Contracts;
+namespace Elqora\ConfigKit\Contracts;
 
 interface SettingsContract extends ProvidesConfigSchema
 {

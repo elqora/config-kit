@@ -28,12 +28,12 @@
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Contracts;
+namespace Elqora\ConfigSchema\Contracts;
 
-use Timeax\ConfigSchema\Schema\ConfigSchema;
-use Timeax\ConfigSchema\Schema\UiConfigSchema;
-use Timeax\ConfigSchema\Support\ConfigBag;
-use Timeax\ConfigSchema\Support\ConfigValidationResult;
+use Elqora\ConfigSchema\Schema\ConfigSchema;
+use Elqora\ConfigSchema\Schema\UiConfigSchema;
+use Elqora\ConfigSchema\Support\ConfigBag;
+use Elqora\ConfigSchema\Support\ConfigValidationResult;
 
 interface ProvidesConfigSchema
 {
@@ -58,7 +58,7 @@ interface ProvidesConfigSchema
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Schema;
+namespace Elqora\ConfigSchema\Schema;
 
 use Closure;
 use InvalidArgumentException;
@@ -192,7 +192,7 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Schema;
+namespace Elqora\ConfigSchema\Schema;
 
 final readonly class ConfigGroup implements ConfigNode
 {
@@ -262,7 +262,7 @@ final readonly class ConfigGroup implements ConfigNode
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Schema;
+namespace Elqora\ConfigSchema\Schema;
 
 use JsonSerializable;
 
@@ -288,7 +288,7 @@ interface ConfigNode extends JsonSerializable
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Schema;
+namespace Elqora\ConfigSchema\Schema;
 
 use Closure;
 use InvalidArgumentException;
@@ -380,7 +380,7 @@ final readonly class ConfigOption implements JsonSerializable
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Schema;
+namespace Elqora\ConfigSchema\Schema;
 
 use JsonSerializable;
 
@@ -528,7 +528,7 @@ readonly class ConfigSchema implements JsonSerializable
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Schema;
+namespace Elqora\ConfigSchema\Schema;
 
 use JsonSerializable;
 
@@ -571,7 +571,7 @@ final readonly class ConfigTab implements JsonSerializable
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Schema;
+namespace Elqora\ConfigSchema\Schema;
 
 use JsonSerializable;
 
@@ -668,10 +668,10 @@ final readonly class UiConfigSchema implements JsonSerializable
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Support;
+namespace Elqora\ConfigSchema\Support;
 
 use JsonSerializable;
-use Timeax\ConfigSchema\Schema\ConfigSchema;
+use Elqora\ConfigSchema\Schema\ConfigSchema;
 
 readonly class ConfigBag implements JsonSerializable
 {
@@ -749,7 +749,7 @@ readonly class ConfigBag implements JsonSerializable
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Support;
+namespace Elqora\ConfigSchema\Support;
 
 use JsonSerializable;
 
@@ -783,7 +783,7 @@ final readonly class ConfigValidationError implements JsonSerializable
 ```php
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigSchema\Support;
+namespace Elqora\ConfigSchema\Support;
 
 use JsonSerializable;
 

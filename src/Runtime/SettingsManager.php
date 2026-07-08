@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Runtime;
+namespace Elqora\ConfigKit\Runtime;
 
 use RuntimeException;
-use Timeax\ConfigKit\Contracts\ConfigSchemaRepository;
-use Timeax\ConfigKit\Contracts\SettingsContract;
-use Timeax\ConfigKit\Contracts\SettingsTargetResolver;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
-use Timeax\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Contracts\ConfigSchemaRepository;
+use Elqora\ConfigKit\Contracts\SettingsContract;
+use Elqora\ConfigKit\Contracts\SettingsTargetResolver;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Support\ConfigBag;
 
 final readonly class SettingsManager
 {

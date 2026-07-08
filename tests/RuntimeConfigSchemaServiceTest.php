@@ -1,19 +1,19 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Tests;
+namespace Elqora\ConfigKit\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Timeax\ConfigKit\Contracts\ConfigFieldValidator;
-use Timeax\ConfigKit\Contracts\ConfigSchemaRepository;
-use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
-use Timeax\ConfigKit\Runtime\ConfigSchemaRecord;
-use Timeax\ConfigKit\Runtime\ConfigSchemaService;
-use Timeax\ConfigKit\Schema\ConfigField;
-use Timeax\ConfigKit\Schema\ConfigSchema;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
-use Timeax\ConfigKit\Support\ConfigBag;
-use Timeax\ConfigKit\Support\ConfigValidationResult;
+use Elqora\ConfigKit\Contracts\ConfigFieldValidator;
+use Elqora\ConfigKit\Contracts\ConfigSchemaRepository;
+use Elqora\ConfigKit\Contracts\ProvidesConfigSchema;
+use Elqora\ConfigKit\Runtime\ConfigSchemaRecord;
+use Elqora\ConfigKit\Runtime\ConfigSchemaService;
+use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigValidationResult;
 
 final class RuntimeConfigSchemaServiceTest extends TestCase
 {
@@ -277,15 +277,15 @@ final class RuntimeProviderDriver implements ProvidesConfigSchema
     }
 }
 
-final readonly class RuntimeSingleDriverResolver implements \Timeax\ConfigKit\Contracts\HandlerTargetResolver
+final readonly class RuntimeSingleDriverResolver implements \Elqora\ConfigKit\Contracts\HandlerTargetResolver
 {
     public function __construct(private RuntimeProviderDriver $driver)
     {
     }
 
-    public function resolve(string $key, int|string $id): \Timeax\ConfigKit\Runtime\ResolvedHandlerTarget
+    public function resolve(string $key, int|string $id): \Elqora\ConfigKit\Runtime\ResolvedHandlerTarget
     {
-        $definition = new \Timeax\ConfigKit\Runtime\HandlerDefinition(
+        $definition = new \Elqora\ConfigKit\Runtime\HandlerDefinition(
             key: $key,
             targetType: $key,
             loadTarget: static fn(): RuntimeTarget => new RuntimeTarget((int) $id),
@@ -294,7 +294,7 @@ final readonly class RuntimeSingleDriverResolver implements \Timeax\ConfigKit\Co
 
         $target = $definition->targetFor($id);
 
-        return new \Timeax\ConfigKit\Runtime\ResolvedHandlerTarget(
+        return new \Elqora\ConfigKit\Runtime\ResolvedHandlerTarget(
             handlerKey: $key,
             target: $target,
             targetId: $definition->targetIdFor($target, $id),

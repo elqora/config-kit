@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Contracts;
+namespace Elqora\ConfigKit\Contracts;
 
-use Timeax\ConfigKit\Schema\ConfigSchema;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
-use Timeax\ConfigKit\Support\ConfigBag;
-use Timeax\ConfigKit\Support\ConfigValidationResult;
+use Elqora\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigValidationResult;
 
 interface ProvidesConfigSchema
 {

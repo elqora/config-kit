@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Runtime;
+namespace Elqora\ConfigKit\Runtime;
 
-use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
-use Timeax\ConfigKit\Support\ConfigBag;
-use Timeax\ConfigKit\Support\ConfigValidationError;
+use Elqora\ConfigKit\Contracts\ProvidesConfigSchema;
+use Elqora\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigValidationError;
 
 final readonly class ConfigApplyResult
 {

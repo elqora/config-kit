@@ -1,17 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Tests;
+namespace Elqora\ConfigKit\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Timeax\ConfigKit\Contracts\ConfigFieldValidator;
-use Timeax\ConfigKit\Runtime\ConfigSchemaStore;
-use Timeax\ConfigKit\Schema\ConfigField;
-use Timeax\ConfigKit\Schema\ConfigGroup;
-use Timeax\ConfigKit\Schema\ConfigOption;
-use Timeax\ConfigKit\Schema\ConfigTab;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
-use Timeax\ConfigKit\Support\ConfigBag;
-use Timeax\ConfigKit\Support\ConfigValidationError;
+use Elqora\ConfigKit\Contracts\ConfigFieldValidator;
+use Elqora\ConfigKit\Runtime\ConfigSchemaStore;
+use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigGroup;
+use Elqora\ConfigKit\Schema\ConfigOption;
+use Elqora\ConfigKit\Schema\ConfigTab;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigValidationError;
 
 final class RuntimeConfigSchemaStoreTest extends TestCase
 {

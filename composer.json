@@ -1,11 +1,11 @@
 {
-    "name": "timeax/config-kit",
+    "name": "elqora/config-kit",
     "description": "SDK config schema designed to provide a general shape for Input field configurations",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Timeax\\ConfigKit\\": "src/"
+            "Elqora\\ConfigKit\\": "src/"
         }
     },
     "authors": [
@@ -20,7 +20,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Timeax\\ConfigKit\\Tests\\": "tests/"
+            "Elqora\\ConfigKit\\Tests\\": "tests/"
         }
     },
     "scripts": {

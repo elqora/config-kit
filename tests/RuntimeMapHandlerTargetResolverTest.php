@@ -1,25 +1,25 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Tests;
+namespace Elqora\ConfigKit\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
-use Timeax\ConfigKit\Runtime\HandlerDefinition;
-use Timeax\ConfigKit\Runtime\MapHandlerTargetResolver;
-use Timeax\ConfigKit\Schema\ConfigSchema;
-use Timeax\ConfigKit\Schema\UiConfigSchema;
-use Timeax\ConfigKit\Support\ConfigBag;
-use Timeax\ConfigKit\Support\ConfigValidationResult;
+use Elqora\ConfigKit\Contracts\ProvidesConfigSchema;
+use Elqora\ConfigKit\Runtime\HandlerDefinition;
+use Elqora\ConfigKit\Runtime\MapHandlerTargetResolver;
+use Elqora\ConfigKit\Schema\ConfigSchema;
+use Elqora\ConfigKit\Schema\UiConfigSchema;
+use Elqora\ConfigKit\Support\ConfigBag;
+use Elqora\ConfigKit\Support\ConfigValidationResult;
 
 final class RuntimeMapHandlerTargetResolverTest extends TestCase
 {
     public function testRuntimeHandlerClassesAreAutoloadable(): void
     {
-        self::assertTrue(interface_exists(\Timeax\ConfigKit\Contracts\HandlerTargetResolver::class));
+        self::assertTrue(interface_exists(\Elqora\ConfigKit\Contracts\HandlerTargetResolver::class));
         self::assertTrue(class_exists(HandlerDefinition::class));
         self::assertTrue(class_exists(MapHandlerTargetResolver::class));
-        self::assertTrue(class_exists(\Timeax\ConfigKit\Runtime\ResolvedHandlerTarget::class));
+        self::assertTrue(class_exists(\Elqora\ConfigKit\Runtime\ResolvedHandlerTarget::class));
     }
 
     public function testResolvesHandlerTargetAndDriverFromMap(): void

@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Timeax\ConfigKit\Runtime;
+namespace Elqora\ConfigKit\Runtime;
 
 use Closure;
-use Timeax\ConfigKit\Contracts\ProvidesConfigSchema;
+use Elqora\ConfigKit\Contracts\ProvidesConfigSchema;
 
 final readonly class HandlerDefinition
 {
