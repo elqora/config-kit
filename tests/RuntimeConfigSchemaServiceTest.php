@@ -10,6 +10,7 @@ use Elqora\ConfigKit\Contracts\ProvidesConfigSchema;
 use Elqora\ConfigKit\Runtime\ConfigSchemaRecord;
 use Elqora\ConfigKit\Runtime\ConfigSchemaService;
 use Elqora\ConfigKit\Schema\ConfigField;
+use Elqora\ConfigKit\Schema\ConfigGroup;
 use Elqora\ConfigKit\Schema\ConfigSchema;
 use Elqora\ConfigKit\Schema\UiConfigSchema;
 use Elqora\ConfigKit\Support\ConfigBag;
@@ -114,6 +115,76 @@ final class RuntimeConfigSchemaServiceTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $service->createProfile(1, 'gateway', 'branch-a', sandbox: true);
+    }
+
+    public function testProfileExcludedFieldsAreIgnoredForSettingsApplyValidationAndPublicConfig(): void
+    {
+        $repository = new RuntimeInMemoryRepository();
+        $repository->save(new ConfigSchemaRecord(
+            id: 11,
+            targetId: 1,
+            targetType: 'gateway',
+            profile: 'limited',
+            options: [
+                'hidden_key' => 'old-hidden',
+                'visible_key' => 'old-visible',
+            ],
+        ));
+
+        $validator = new class implements ConfigFieldValidator {
+            public array $data = [];
+            public array $rules = [];
+
+            public function validate(array $data, array $rules): array
+            {
+                $this->data = $data;
+                $this->rules = $rules;
+
+                return [];
+            }
+        };
+
+        $service = new ConfigSchemaService($repository, validator: $validator);
+        $schema = new UiConfigSchema([
+            'hidden_key' => new ConfigField(
+                name: 'hidden_key',
+                label: 'Hidden Key',
+                rules: ['required'],
+                excludedFromProfiles: ['limited'],
+            ),
+            'visible_group' => new ConfigGroup(
+                label: 'Visible Group',
+                children: [
+                    'visible_key' => new ConfigField(
+                        name: 'visible_key',
+                        label: 'Visible Key',
+                        rules: ['required'],
+                    ),
+                ],
+            ),
+        ]);
+
+        $payload = $service->settings(1, 'gateway', $schema, profile: 'limited');
+        self::assertSame(['visible_group'], array_column($payload['settings'], 'schemaKey'));
+
+        $result = $service->apply(
+            targetId: 1,
+            targetType: 'gateway',
+            values: [
+                'hidden_key' => 'new-hidden',
+                'visible_key' => 'new-visible',
+            ],
+            schema: $schema,
+            profile: 'limited',
+        );
+
+        self::assertTrue($result->ok());
+        self::assertSame('old-hidden', $result->record->options['hidden_key']);
+        self::assertSame('new-visible', $result->record->options['visible_key']);
+        self::assertArrayNotHasKey('hidden_key', $validator->rules);
+        self::assertArrayNotHasKey('hidden_key', $validator->data);
+        self::assertSame(['visible_key' => 'new-visible'], $result->record->publicConfig['options']);
+        self::assertArrayNotHasKey('hidden_key', $result->record->publicConfig['options']);
     }
 
     public static function schema(): UiConfigSchema

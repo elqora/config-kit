@@ -314,8 +314,16 @@ Common conventions:
 - `tabs` lists tab IDs where a group or field belongs.
 - `includes` lists related field or group keys that should be shown.
 - `excludes` lists related field or group keys that should be hidden.
+- `excludedFromProfiles` removes a config object from a backend profile contract.
 - `isButton` lets a renderer display select/radio options as button-like
   choices.
+
+Profile exclusions are supported on `ConfigField`, `ConfigGroup`, `ConfigTab`,
+and `ConfigOption`, including nested option children. Plain strings match exact
+profile names, while regex literals such as `/^tenant-preview-/` can match a
+profile family. The `default` profile is protected from broad regex rules; use
+the literal `default` rule when an object must be excluded from the default
+profile.
 
 ## Lazy Options and Nested Option Children
 
@@ -902,13 +910,15 @@ Example serialized payload:
           "tabs": [],
           "isButton": false,
           "includes": [],
-          "excludes": []
+          "excludes": [],
+          "excludedFromProfiles": []
         }
       },
       "meta": {},
       "tabs": [],
       "includes": [],
-      "excludes": []
+      "excludes": [],
+      "excludedFromProfiles": []
     }
   },
   "tabs": []

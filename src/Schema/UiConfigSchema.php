@@ -28,6 +28,27 @@ final readonly class UiConfigSchema implements JsonSerializable
         return new self($settings, $this->tabs);
     }
 
+    public function forProfile(string $profile): self
+    {
+        $settings = [];
+
+        foreach ($this->settings as $key => $node) {
+            $filtered = $this->nodeForProfile($node, $profile);
+
+            if ($filtered instanceof ConfigNode) {
+                $settings[$key] = $filtered;
+            }
+        }
+
+        return new self(
+            settings: $settings,
+            tabs: array_values(array_filter(
+                $this->tabs,
+                static fn(ConfigTab $tab): bool => !$tab->excludedFromProfile($profile),
+            )),
+        );
+    }
+
     /**
      * Flatten the tree into the existing flat ConfigSchema(fields[]).
      * Optionally filter by sandbox mode:
@@ -84,5 +105,18 @@ final readonly class UiConfigSchema implements JsonSerializable
                 $this->tabs
             ),
         ];
+    }
+
+    private function nodeForProfile(ConfigNode $node, string $profile): ?ConfigNode
+    {
+        if ($node instanceof ConfigField) {
+            return $node->forProfile($profile);
+        }
+
+        if ($node instanceof ConfigGroup) {
+            return $node->forProfile($profile);
+        }
+
+        return $node;
     }
 }

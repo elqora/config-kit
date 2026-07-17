@@ -94,6 +94,13 @@
           },
           "default": []
         },
+        "excludedFromProfiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
         "children": {
           "type": "array",
           "items": {
@@ -145,6 +152,13 @@
         "meta": {
           "type": "object",
           "default": {}
+        },
+        "excludedFromProfiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
         }
       },
       "required": [
@@ -275,6 +289,13 @@
           "default": []
         },
         "excludes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "excludedFromProfiles": {
           "type": "array",
           "items": {
             "type": "string"
@@ -599,6 +620,13 @@
           "default": []
         },
         "excludes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "excludedFromProfiles": {
           "type": "array",
           "items": {
             "type": "string"

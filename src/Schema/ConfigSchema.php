@@ -34,6 +34,21 @@ readonly class ConfigSchema implements JsonSerializable
         return $this->forSandbox(true);
     }
 
+    final public function forProfile(string $profile): self
+    {
+        $fields = [];
+
+        foreach ($this->fields as $field) {
+            $filtered = $field->forProfile($profile);
+
+            if ($filtered instanceof ConfigField) {
+                $fields[] = $filtered;
+            }
+        }
+
+        return new self($fields);
+    }
+
     /** @return array<int,string> field names for the requested sandbox mode */
     public function keysForSandbox(bool $sandbox): array
     {

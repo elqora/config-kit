@@ -15,6 +15,7 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
      * @param array<int,string> $tabs
      * @param array<int,string> $includes
      * @param array<int,string> $excludes
+     * @param array<int,string> $excludedFromProfiles
      */
     public function __construct(
         public string  $name,
@@ -35,6 +36,7 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
         public bool    $isButton = false,
         public array   $includes = [],
         public array   $excludes = [],
+        public array   $excludedFromProfiles = [],
     )
     {
     }
@@ -63,6 +65,41 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
             isButton: $this->isButton,
             includes: $this->includes,
             excludes: $this->excludes,
+            excludedFromProfiles: $this->excludedFromProfiles,
+        );
+    }
+
+    public function forProfile(string $profile): ?self
+    {
+        if (ProfileExclusion::matches($profile, $this->excludedFromProfiles)) {
+            return null;
+        }
+
+        $options = $this->options;
+        if ($options instanceof Closure) {
+            $options = fn(): array => $this->filterOptionsForProfile($profile);
+        } else {
+            $options = $this->filterOptionsForProfile($profile);
+        }
+
+        return new self(
+            name: $this->name,
+            label: $this->label,
+            type: $this->type,
+            required: $this->required,
+            secret: $this->secret,
+            rules: $this->rules,
+            default: $this->default,
+            helpText: $this->helpText,
+            options: $options,
+            sandbox: $this->sandbox,
+            meta: $this->meta,
+            group: $this->group,
+            tabs: $this->tabs,
+            isButton: $this->isButton,
+            includes: $this->includes,
+            excludes: $this->excludes,
+            excludedFromProfiles: $this->excludedFromProfiles,
         );
     }
 
@@ -120,6 +157,25 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
             'isButton' => $this->isButton,
             'includes' => $this->includes,
             'excludes' => $this->excludes,
+            'excludedFromProfiles' => $this->excludedFromProfiles,
         ];
+    }
+
+    /**
+     * @return array<int,ConfigOption>
+     */
+    private function filterOptionsForProfile(string $profile): array
+    {
+        $options = [];
+
+        foreach ($this->resolveOptions() as $option) {
+            $filtered = $option->forProfile($profile);
+
+            if ($filtered instanceof ConfigOption) {
+                $options[] = $filtered;
+            }
+        }
+
+        return $options;
     }
 }

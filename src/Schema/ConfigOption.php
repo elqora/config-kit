@@ -14,6 +14,7 @@ final readonly class ConfigOption implements JsonSerializable
      * @param array<int,string> $includes
      * @param array<int,string> $excludes
      * @param array<int,ConfigOption>|Closure():array<int,ConfigOption> $children
+     * @param array<int,string> $excludedFromProfiles
      */
     public function __construct(
         public string|int    $value,
@@ -21,10 +22,35 @@ final readonly class ConfigOption implements JsonSerializable
         ?string              $id = null,
         public array         $includes = [],
         public array         $excludes = [],
-        public array|Closure $children = []
+        public array|Closure $children = [],
+        public array         $excludedFromProfiles = [],
     )
     {
         $this->id = $id ?? self::deriveId($value);
+    }
+
+    public function forProfile(string $profile): ?self
+    {
+        if (ProfileExclusion::matches($profile, $this->excludedFromProfiles)) {
+            return null;
+        }
+
+        $children = $this->children;
+        if ($children instanceof Closure) {
+            $children = fn(): array => $this->filterChildrenForProfile($profile);
+        } else {
+            $children = $this->filterChildrenForProfile($profile);
+        }
+
+        return new self(
+            value: $this->value,
+            label: $this->label,
+            id: $this->id,
+            includes: $this->includes,
+            excludes: $this->excludes,
+            children: $children,
+            excludedFromProfiles: $this->excludedFromProfiles,
+        );
     }
 
     public function jsonSerialize(): array
@@ -35,6 +61,7 @@ final readonly class ConfigOption implements JsonSerializable
             'label' => $this->label,
             'includes' => $this->includes,
             'excludes' => $this->excludes,
+            'excludedFromProfiles' => $this->excludedFromProfiles,
             'children' => array_map(
                 static fn(ConfigOption $option) => $option->jsonSerialize(),
                 $this->resolveChildren()
@@ -70,6 +97,24 @@ final readonly class ConfigOption implements JsonSerializable
         }
 
         return $resolved;
+    }
+
+    /**
+     * @return array<int,ConfigOption>
+     */
+    private function filterChildrenForProfile(string $profile): array
+    {
+        $children = [];
+
+        foreach ($this->resolveChildren() as $child) {
+            $filtered = $child->forProfile($profile);
+
+            if ($filtered instanceof ConfigOption) {
+                $children[] = $filtered;
+            }
+        }
+
+        return $children;
     }
 
     private static function deriveId(string|int $value): string

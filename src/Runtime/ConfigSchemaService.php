@@ -42,14 +42,15 @@ final readonly class ConfigSchemaService
         string $profile = 'default',
         bool $sandbox = false,
     ): array {
+        $profile = $this->normalizeProfile($profile);
         $record = $this->repository->getOrCreate(
             targetId: $targetId,
             targetType: $targetType,
-            profile: $this->normalizeProfile($profile),
+            profile: $profile,
             sandbox: $sandbox,
         );
 
-        $frontend = $this->store->toFrontendSettings($schema, $this->bagForRecord($record));
+        $frontend = $this->store->toFrontendSettings($schema->forProfile($profile), $this->bagForRecord($record));
 
         return [
             'targetId' => $targetId,
@@ -92,10 +93,13 @@ final readonly class ConfigSchemaService
             throw new RuntimeException('A UiConfigSchema is required to apply configuration values.');
         }
 
+        $profile = $this->normalizeProfile($profile);
+        $schema = $schema->forProfile($profile);
+
         $record = $this->repository->getOrCreate(
             targetId: $targetId,
             targetType: $targetType,
-            profile: $this->normalizeProfile($profile),
+            profile: $profile,
             sandbox: $sandbox,
         );
 
@@ -105,11 +109,12 @@ final readonly class ConfigSchemaService
             values: $values,
             allowClearSecrets: $allowClearSecrets,
         );
+        $contractBag = $this->store->contractBag($schema, $candidate->bag);
 
-        $errors = $this->store->validateBag($schema, $candidate->bag);
+        $errors = $this->store->validateBag($schema, $contractBag);
 
         if ($driver instanceof ProvidesConfigSchema) {
-            $providerValidation = $driver->validateConfig($candidate->bag);
+            $providerValidation = $driver->validateConfig($contractBag);
 
             if (!$providerValidation->isOk()) {
                 $errors = $this->mergeErrors($errors, $providerValidation->errors());
@@ -128,8 +133,8 @@ final readonly class ConfigSchemaService
         $record->options = $candidate->options;
         $record->secrets = $candidate->secrets;
         $record->publicConfig = $driver instanceof ProvidesConfigSchema
-            ? $driver->publicConfig($candidate->bag)
-            : $candidate->bag->toPublicArray();
+            ? $driver->publicConfig($contractBag)
+            : $contractBag->toPublicArray();
 
         if ($makeDefault) {
             $this->repository->clearDefaults($record->targetId, $record->targetType, $record->sandbox);

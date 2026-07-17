@@ -125,6 +125,33 @@ final readonly class ConfigSchemaStore
         return $this->normalizeValidationErrors($this->validator->validate($data, $rules));
     }
 
+    public function contractBag(UiConfigSchema $schema, ConfigBag $bag): ConfigBag
+    {
+        $flat = $schema->flatten()->forSandbox($bag->sandbox);
+        $options = [];
+        $secrets = [];
+
+        foreach ($flat->fields as $field) {
+            if ($field->secret) {
+                if (array_key_exists($field->name, $bag->secrets)) {
+                    $secrets[$field->name] = $bag->secrets[$field->name];
+                }
+
+                continue;
+            }
+
+            if (array_key_exists($field->name, $bag->options)) {
+                $options[$field->name] = $bag->options[$field->name];
+            }
+        }
+
+        return new ConfigBag(
+            sandbox: $bag->sandbox,
+            options: $options,
+            secrets: $secrets,
+        );
+    }
+
     private function nodeToFrontend(ConfigNode $node, ConfigBag $bag): array
     {
         if ($node instanceof ConfigGroup) {
@@ -143,6 +170,7 @@ final readonly class ConfigSchemaStore
                 'tabs' => $node->tabs,
                 'includes' => $node->includes,
                 'excludes' => $node->excludes,
+                'excludedFromProfiles' => $node->excludedFromProfiles,
                 'children' => $children,
             ];
         }
@@ -172,6 +200,7 @@ final readonly class ConfigSchemaStore
             'isButton' => $node->isButton,
             'includes' => $node->includes,
             'excludes' => $node->excludes,
+            'excludedFromProfiles' => $node->excludedFromProfiles,
             'options' => array_map(
                 fn(ConfigOption $option): array => $this->optionToFrontend($option),
                 $node->resolveOptions(),
@@ -189,6 +218,7 @@ final readonly class ConfigSchemaStore
             'includes' => $tab->includes,
             'excludes' => $tab->excludes,
             'meta' => $tab->meta,
+            'excludedFromProfiles' => $tab->excludedFromProfiles,
         ];
     }
 
@@ -204,6 +234,7 @@ final readonly class ConfigSchemaStore
             'label' => $this->normalizeOptionLabel($rawLabel, $rawValue),
             'includes' => is_array($serialized['includes'] ?? null) ? $serialized['includes'] : [],
             'excludes' => is_array($serialized['excludes'] ?? null) ? $serialized['excludes'] : [],
+            'excludedFromProfiles' => is_array($serialized['excludedFromProfiles'] ?? null) ? $serialized['excludedFromProfiles'] : [],
         ];
 
         if (isset($serialized['children']) && is_array($serialized['children']) && $serialized['children'] !== []) {
@@ -231,6 +262,7 @@ final readonly class ConfigSchemaStore
             'label' => $this->normalizeOptionLabel($rawLabel, $rawValue),
             'includes' => is_array($option['includes'] ?? null) ? $option['includes'] : [],
             'excludes' => is_array($option['excludes'] ?? null) ? $option['excludes'] : [],
+            'excludedFromProfiles' => is_array($option['excludedFromProfiles'] ?? null) ? $option['excludedFromProfiles'] : [],
         ];
 
         if (isset($option['children']) && is_array($option['children']) && $option['children'] !== []) {
