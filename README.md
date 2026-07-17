@@ -320,12 +320,97 @@ Common conventions:
 - `isButton` lets a renderer display select/radio options as button-like
   choices.
 
-Profile exclusions are supported on `ConfigField`, `ConfigGroup`, `ConfigTab`,
-and `ConfigOption`, including nested option children. Plain strings match exact
-profile names, while regex literals such as `/^tenant-preview-/` can match a
-profile family. The `default` profile is protected from broad regex rules; use
-the literal `default` rule when an object must be excluded from the default
-profile.
+### Profile Exclusions
+
+Use `excludedFromProfiles` when a config object should not belong to one or
+more runtime profiles at all. This is a backend schema-contract rule, not a UI
+hint: when a profile excludes an object, runtime operations for that profile
+behave as if the object was not declared.
+
+Profile exclusions are supported on:
+
+- `ConfigField`
+- `ConfigGroup`
+- `ConfigTab`
+- `ConfigOption`, including nested option children
+
+Plain strings match exact profile names:
+
+```php
+<?php
+
+new ConfigField(
+    name: 'advanced_api_key',
+    label: 'Advanced API Key',
+    excludedFromProfiles: ['tenant-lite'],
+);
+```
+
+Regex literals can match profile families:
+
+```php
+<?php
+
+new ConfigGroup(
+    label: 'Preview Controls',
+    excludedFromProfiles: ['/^tenant-preview-/'],
+    children: [
+        'preview_token' => new ConfigField(
+            name: 'preview_token',
+            label: 'Preview Token',
+        ),
+    ],
+);
+```
+
+The `default` profile is protected from broad rules. Regex rules such as
+`/.*/` do not exclude objects from `default`; excluding from the default profile
+must be literal and explicit:
+
+```php
+<?php
+
+new ConfigTab(
+    id: 'experimental',
+    label: 'Experimental',
+    excludedFromProfiles: ['default'],
+);
+```
+
+Options can also be profile-scoped. This removes a choice without removing the
+field that owns it:
+
+```php
+<?php
+
+new ConfigField(
+    name: 'settlement_mode',
+    label: 'Settlement Mode',
+    type: 'select',
+    options: [
+        new ConfigOption('standard', 'Standard'),
+        new ConfigOption(
+            value: 'instant',
+            label: 'Instant',
+            excludedFromProfiles: ['tenant-lite'],
+        ),
+    ],
+);
+```
+
+Runtime behavior:
+
+- `settings()` filters the schema by the requested profile before returning the
+  payload.
+- `apply()` filters the schema by the requested profile before accepting,
+  validating, or publishing values.
+- Excluded submitted values are ignored.
+- Existing stored values for excluded fields are preserved; profile exclusion
+  does not delete stored options or secrets.
+- Excluded fields are skipped during validation and public config generation.
+- Excluded groups remove all descendants, and groups left empty by filtering are
+  removed.
+- Excluded tabs are removed from the tab list.
 
 Use `requires` when an object should only be available under certain config
 values. The settings payload keeps these conditions intact so frontend
