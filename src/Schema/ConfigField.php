@@ -5,6 +5,7 @@ namespace Elqora\ConfigKit\Schema;
 use Closure;
 use InvalidArgumentException;
 use JsonSerializable;
+use Elqora\ConfigKit\Support\ConfigBag;
 
 final readonly class ConfigField implements JsonSerializable, ConfigNode
 {
@@ -16,6 +17,7 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
      * @param array<int,string> $includes
      * @param array<int,string> $excludes
      * @param array<int,string> $excludedFromProfiles
+     * @param array<string,mixed> $requires
      */
     public function __construct(
         public string  $name,
@@ -37,6 +39,7 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
         public array   $includes = [],
         public array   $excludes = [],
         public array   $excludedFromProfiles = [],
+        public array   $requires = [],
     )
     {
     }
@@ -66,6 +69,7 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
             includes: $this->includes,
             excludes: $this->excludes,
             excludedFromProfiles: $this->excludedFromProfiles,
+            requires: $this->requires,
         );
     }
 
@@ -100,6 +104,42 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
             includes: $this->includes,
             excludes: $this->excludes,
             excludedFromProfiles: $this->excludedFromProfiles,
+            requires: $this->requires,
+        );
+    }
+
+    public function forRequirements(ConfigBag $bag): ?self
+    {
+        if (!SchemaRequirement::matches($this->requires, $bag)) {
+            return null;
+        }
+
+        $options = $this->options;
+        if ($options instanceof Closure) {
+            $options = fn(): array => $this->filterOptionsForRequirements($bag);
+        } else {
+            $options = $this->filterOptionsForRequirements($bag);
+        }
+
+        return new self(
+            name: $this->name,
+            label: $this->label,
+            type: $this->type,
+            required: $this->required,
+            secret: $this->secret,
+            rules: $this->rules,
+            default: $this->default,
+            helpText: $this->helpText,
+            options: $options,
+            sandbox: $this->sandbox,
+            meta: $this->meta,
+            group: $this->group,
+            tabs: $this->tabs,
+            isButton: $this->isButton,
+            includes: $this->includes,
+            excludes: $this->excludes,
+            excludedFromProfiles: $this->excludedFromProfiles,
+            requires: $this->requires,
         );
     }
 
@@ -158,6 +198,7 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
             'includes' => $this->includes,
             'excludes' => $this->excludes,
             'excludedFromProfiles' => $this->excludedFromProfiles,
+            'requires' => $this->requires,
         ];
     }
 
@@ -170,6 +211,24 @@ final readonly class ConfigField implements JsonSerializable, ConfigNode
 
         foreach ($this->resolveOptions() as $option) {
             $filtered = $option->forProfile($profile);
+
+            if ($filtered instanceof ConfigOption) {
+                $options[] = $filtered;
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * @return array<int,ConfigOption>
+     */
+    private function filterOptionsForRequirements(ConfigBag $bag): array
+    {
+        $options = [];
+
+        foreach ($this->resolveOptions() as $option) {
+            $filtered = $option->forRequirements($bag);
 
             if ($filtered instanceof ConfigOption) {
                 $options[] = $filtered;

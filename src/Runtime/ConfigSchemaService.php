@@ -109,6 +109,13 @@ final readonly class ConfigSchemaService
             values: $values,
             allowClearSecrets: $allowClearSecrets,
         );
+        $schema = $schema->forRequirements($candidate->bag);
+        $candidate = $this->store->candidate(
+            schema: $schema,
+            current: $this->bagForRecord($record),
+            values: $values,
+            allowClearSecrets: $allowClearSecrets,
+        );
         $contractBag = $this->store->contractBag($schema, $candidate->bag);
 
         $errors = $this->store->validateBag($schema, $contractBag);

@@ -5,6 +5,7 @@ namespace Elqora\ConfigKit\Schema;
 use Closure;
 use InvalidArgumentException;
 use JsonSerializable;
+use Elqora\ConfigKit\Support\ConfigBag;
 
 final readonly class ConfigOption implements JsonSerializable
 {
@@ -15,6 +16,7 @@ final readonly class ConfigOption implements JsonSerializable
      * @param array<int,string> $excludes
      * @param array<int,ConfigOption>|Closure():array<int,ConfigOption> $children
      * @param array<int,string> $excludedFromProfiles
+     * @param array<string,mixed> $requires
      */
     public function __construct(
         public string|int    $value,
@@ -24,6 +26,7 @@ final readonly class ConfigOption implements JsonSerializable
         public array         $excludes = [],
         public array|Closure $children = [],
         public array         $excludedFromProfiles = [],
+        public array         $requires = [],
     )
     {
         $this->id = $id ?? self::deriveId($value);
@@ -50,6 +53,32 @@ final readonly class ConfigOption implements JsonSerializable
             excludes: $this->excludes,
             children: $children,
             excludedFromProfiles: $this->excludedFromProfiles,
+            requires: $this->requires,
+        );
+    }
+
+    public function forRequirements(ConfigBag $bag): ?self
+    {
+        if (!SchemaRequirement::matches($this->requires, $bag)) {
+            return null;
+        }
+
+        $children = $this->children;
+        if ($children instanceof Closure) {
+            $children = fn(): array => $this->filterChildrenForRequirements($bag);
+        } else {
+            $children = $this->filterChildrenForRequirements($bag);
+        }
+
+        return new self(
+            value: $this->value,
+            label: $this->label,
+            id: $this->id,
+            includes: $this->includes,
+            excludes: $this->excludes,
+            children: $children,
+            excludedFromProfiles: $this->excludedFromProfiles,
+            requires: $this->requires,
         );
     }
 
@@ -62,6 +91,7 @@ final readonly class ConfigOption implements JsonSerializable
             'includes' => $this->includes,
             'excludes' => $this->excludes,
             'excludedFromProfiles' => $this->excludedFromProfiles,
+            'requires' => $this->requires,
             'children' => array_map(
                 static fn(ConfigOption $option) => $option->jsonSerialize(),
                 $this->resolveChildren()
@@ -108,6 +138,24 @@ final readonly class ConfigOption implements JsonSerializable
 
         foreach ($this->resolveChildren() as $child) {
             $filtered = $child->forProfile($profile);
+
+            if ($filtered instanceof ConfigOption) {
+                $children[] = $filtered;
+            }
+        }
+
+        return $children;
+    }
+
+    /**
+     * @return array<int,ConfigOption>
+     */
+    private function filterChildrenForRequirements(ConfigBag $bag): array
+    {
+        $children = [];
+
+        foreach ($this->resolveChildren() as $child) {
+            $filtered = $child->forRequirements($bag);
 
             if ($filtered instanceof ConfigOption) {
                 $children[] = $filtered;

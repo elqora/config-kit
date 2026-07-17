@@ -315,6 +315,8 @@ Common conventions:
 - `includes` lists related field or group keys that should be shown.
 - `excludes` lists related field or group keys that should be hidden.
 - `excludedFromProfiles` removes a config object from a backend profile contract.
+- `requires` declares the config values a field, group, or option needs before
+  it can be applied.
 - `isButton` lets a renderer display select/radio options as button-like
   choices.
 
@@ -324,6 +326,43 @@ profile names, while regex literals such as `/^tenant-preview-/` can match a
 profile family. The `default` profile is protected from broad regex rules; use
 the literal `default` rule when an object must be excluded from the default
 profile.
+
+Use `requires` when an object should only be available under certain config
+values. The settings payload keeps these conditions intact so frontend
+interfaces can render dynamic forms, while the backend enforces them during
+apply:
+
+```php
+<?php
+
+new ConfigField(
+    name: 'card_statement_descriptor',
+    label: 'Card Statement Descriptor',
+    requires: ['payment_method' => 'card'],
+);
+
+new ConfigGroup(
+    label: 'Bank Transfer',
+    requires: ['payment_method' => ['bank', 'transfer']],
+    children: [
+        'bank_account_name' => new ConfigField(
+            name: 'bank_account_name',
+            label: 'Bank Account Name',
+        ),
+    ],
+);
+
+new ConfigOption(
+    value: 'instant_settlement',
+    label: 'Instant Settlement',
+    requires: ['country' => ['in' => ['ng', 'gh']]],
+);
+```
+
+Supported `requires` operators are `equals`, `not`, `in`, `notIn`, `filled`,
+`empty`, and `regex`. Missing dependency values fail every operator except
+`empty`; scalar comparisons use normalized string values, and array values use
+contains-style matching.
 
 ## Lazy Options and Nested Option Children
 
@@ -911,14 +950,16 @@ Example serialized payload:
           "isButton": false,
           "includes": [],
           "excludes": [],
-          "excludedFromProfiles": []
+          "excludedFromProfiles": [],
+          "requires": {}
         }
       },
       "meta": {},
       "tabs": [],
       "includes": [],
       "excludes": [],
-      "excludedFromProfiles": []
+      "excludedFromProfiles": [],
+      "requires": {}
     }
   },
   "tabs": []

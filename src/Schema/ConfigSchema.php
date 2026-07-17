@@ -3,6 +3,7 @@
 namespace Elqora\ConfigKit\Schema;
 
 use JsonSerializable;
+use Elqora\ConfigKit\Support\ConfigBag;
 
 readonly class ConfigSchema implements JsonSerializable
 {
@@ -40,6 +41,21 @@ readonly class ConfigSchema implements JsonSerializable
 
         foreach ($this->fields as $field) {
             $filtered = $field->forProfile($profile);
+
+            if ($filtered instanceof ConfigField) {
+                $fields[] = $filtered;
+            }
+        }
+
+        return new self($fields);
+    }
+
+    final public function forRequirements(ConfigBag $bag): self
+    {
+        $fields = [];
+
+        foreach ($this->fields as $field) {
+            $filtered = $field->forRequirements($bag);
 
             if ($filtered instanceof ConfigField) {
                 $fields[] = $filtered;

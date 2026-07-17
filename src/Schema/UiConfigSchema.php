@@ -3,6 +3,7 @@
 namespace Elqora\ConfigKit\Schema;
 
 use JsonSerializable;
+use Elqora\ConfigKit\Support\ConfigBag;
 
 final readonly class UiConfigSchema implements JsonSerializable
 {
@@ -47,6 +48,21 @@ final readonly class UiConfigSchema implements JsonSerializable
                 static fn(ConfigTab $tab): bool => !$tab->excludedFromProfile($profile),
             )),
         );
+    }
+
+    public function forRequirements(ConfigBag $bag): self
+    {
+        $settings = [];
+
+        foreach ($this->settings as $key => $node) {
+            $filtered = $this->nodeForRequirements($node, $bag);
+
+            if ($filtered instanceof ConfigNode) {
+                $settings[$key] = $filtered;
+            }
+        }
+
+        return new self($settings, $this->tabs);
     }
 
     /**
@@ -115,6 +131,19 @@ final readonly class UiConfigSchema implements JsonSerializable
 
         if ($node instanceof ConfigGroup) {
             return $node->forProfile($profile);
+        }
+
+        return $node;
+    }
+
+    private function nodeForRequirements(ConfigNode $node, ConfigBag $bag): ?ConfigNode
+    {
+        if ($node instanceof ConfigField) {
+            return $node->forRequirements($bag);
+        }
+
+        if ($node instanceof ConfigGroup) {
+            return $node->forRequirements($bag);
         }
 
         return $node;

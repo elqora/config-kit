@@ -171,6 +171,7 @@ final readonly class ConfigSchemaStore
                 'includes' => $node->includes,
                 'excludes' => $node->excludes,
                 'excludedFromProfiles' => $node->excludedFromProfiles,
+                'requires' => $node->requires,
                 'children' => $children,
             ];
         }
@@ -201,6 +202,7 @@ final readonly class ConfigSchemaStore
             'includes' => $node->includes,
             'excludes' => $node->excludes,
             'excludedFromProfiles' => $node->excludedFromProfiles,
+            'requires' => $node->requires,
             'options' => array_map(
                 fn(ConfigOption $option): array => $this->optionToFrontend($option),
                 $node->resolveOptions(),
@@ -235,6 +237,7 @@ final readonly class ConfigSchemaStore
             'includes' => is_array($serialized['includes'] ?? null) ? $serialized['includes'] : [],
             'excludes' => is_array($serialized['excludes'] ?? null) ? $serialized['excludes'] : [],
             'excludedFromProfiles' => is_array($serialized['excludedFromProfiles'] ?? null) ? $serialized['excludedFromProfiles'] : [],
+            'requires' => is_array($serialized['requires'] ?? null) ? $serialized['requires'] : [],
         ];
 
         if (isset($serialized['children']) && is_array($serialized['children']) && $serialized['children'] !== []) {
@@ -263,6 +266,7 @@ final readonly class ConfigSchemaStore
             'includes' => is_array($option['includes'] ?? null) ? $option['includes'] : [],
             'excludes' => is_array($option['excludes'] ?? null) ? $option['excludes'] : [],
             'excludedFromProfiles' => is_array($option['excludedFromProfiles'] ?? null) ? $option['excludedFromProfiles'] : [],
+            'requires' => is_array($option['requires'] ?? null) ? $option['requires'] : [],
         ];
 
         if (isset($option['children']) && is_array($option['children']) && $option['children'] !== []) {

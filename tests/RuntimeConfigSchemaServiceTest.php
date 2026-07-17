@@ -11,6 +11,7 @@ use Elqora\ConfigKit\Runtime\ConfigSchemaRecord;
 use Elqora\ConfigKit\Runtime\ConfigSchemaService;
 use Elqora\ConfigKit\Schema\ConfigField;
 use Elqora\ConfigKit\Schema\ConfigGroup;
+use Elqora\ConfigKit\Schema\ConfigOption;
 use Elqora\ConfigKit\Schema\ConfigSchema;
 use Elqora\ConfigKit\Schema\UiConfigSchema;
 use Elqora\ConfigKit\Support\ConfigBag;
@@ -187,6 +188,141 @@ final class RuntimeConfigSchemaServiceTest extends TestCase
         self::assertArrayNotHasKey('hidden_key', $result->record->publicConfig['options']);
     }
 
+    public function testRequiresAreSerializedForSettingsButOnlyEnforcedOnApply(): void
+    {
+        $repository = new RuntimeInMemoryRepository();
+        $repository->save(new ConfigSchemaRecord(
+            id: 12,
+            targetId: 1,
+            targetType: 'gateway',
+            options: [
+                'payment_method' => 'bank',
+                'card_statement_descriptor' => 'old-card',
+            ],
+        ));
+
+        $validator = new class implements ConfigFieldValidator {
+            public array $rules = [];
+
+            public function validate(array $data, array $rules): array
+            {
+                $this->rules = $rules;
+
+                return [];
+            }
+        };
+
+        $service = new ConfigSchemaService($repository, validator: $validator);
+        $schema = self::requiresSchema();
+
+        $payload = $service->settings(1, 'gateway', $schema);
+        self::assertSame(
+            ['payment_method', 'card_statement_descriptor'],
+            array_column($payload['settings'], 'schemaKey'),
+        );
+        self::assertSame(
+            ['payment_method' => 'card'],
+            $payload['settings'][1]['requires'],
+        );
+
+        $result = $service->apply(
+            targetId: 1,
+            targetType: 'gateway',
+            values: [
+                'payment_method' => 'bank',
+                'card_statement_descriptor' => 'new-card',
+            ],
+            schema: $schema,
+        );
+
+        self::assertTrue($result->ok());
+        self::assertSame('bank', $result->record->options['payment_method']);
+        self::assertSame('old-card', $result->record->options['card_statement_descriptor']);
+        self::assertArrayNotHasKey('card_statement_descriptor', $validator->rules);
+        self::assertSame(['payment_method' => 'bank'], $result->record->publicConfig['options']);
+
+        $result = $service->apply(
+            targetId: 1,
+            targetType: 'gateway',
+            values: [
+                'payment_method' => 'card',
+                'card_statement_descriptor' => 'new-card',
+            ],
+            schema: $schema,
+        );
+
+        self::assertTrue($result->ok());
+        self::assertSame('card', $result->record->options['payment_method']);
+        self::assertSame('new-card', $result->record->options['card_statement_descriptor']);
+        self::assertArrayHasKey('card_statement_descriptor', $validator->rules);
+        self::assertSame('new-card', $result->record->publicConfig['options']['card_statement_descriptor']);
+    }
+
+    public function testRequiresFilterGroupsAndOptionsForApplyContract(): void
+    {
+        $repository = new RuntimeInMemoryRepository();
+        $repository->save(new ConfigSchemaRecord(
+            id: 13,
+            targetId: 1,
+            targetType: 'gateway',
+            options: [
+                'mode' => 'basic',
+                'advanced_key' => 'old-advanced',
+            ],
+        ));
+
+        $service = new ConfigSchemaService($repository);
+        $schema = new UiConfigSchema([
+            'mode' => new ConfigField(
+                name: 'mode',
+                label: 'Mode',
+                type: 'select',
+                options: [
+                    new ConfigOption('basic', 'Basic'),
+                    new ConfigOption('advanced', 'Advanced', requires: ['tier' => ['in' => ['pro']]]),
+                ],
+            ),
+            'advanced' => new ConfigGroup(
+                label: 'Advanced',
+                children: [
+                    'advanced_key' => new ConfigField(
+                        name: 'advanced_key',
+                        label: 'Advanced Key',
+                    ),
+                ],
+                requires: ['mode' => 'advanced'],
+            ),
+        ]);
+
+        $basic = $service->apply(
+            targetId: 1,
+            targetType: 'gateway',
+            values: [
+                'mode' => 'basic',
+                'advanced_key' => 'new-advanced',
+            ],
+            schema: $schema,
+        );
+
+        self::assertTrue($basic->ok());
+        self::assertSame('old-advanced', $basic->record->options['advanced_key']);
+        self::assertArrayNotHasKey('advanced_key', $basic->record->publicConfig['options']);
+
+        $advanced = $service->apply(
+            targetId: 1,
+            targetType: 'gateway',
+            values: [
+                'mode' => 'advanced',
+                'advanced_key' => 'new-advanced',
+            ],
+            schema: $schema,
+        );
+
+        self::assertTrue($advanced->ok());
+        self::assertSame('new-advanced', $advanced->record->options['advanced_key']);
+        self::assertSame('new-advanced', $advanced->record->publicConfig['options']['advanced_key']);
+    }
+
     public static function schema(): UiConfigSchema
     {
         return new UiConfigSchema([
@@ -200,6 +336,27 @@ final class RuntimeConfigSchemaServiceTest extends TestCase
                 label: 'Secret Key',
                 type: 'password',
                 secret: true,
+            ),
+        ]);
+    }
+
+    private static function requiresSchema(): UiConfigSchema
+    {
+        return new UiConfigSchema([
+            'payment_method' => new ConfigField(
+                name: 'payment_method',
+                label: 'Payment Method',
+                type: 'select',
+                options: [
+                    new ConfigOption('card', 'Card'),
+                    new ConfigOption('bank', 'Bank'),
+                ],
+            ),
+            'card_statement_descriptor' => new ConfigField(
+                name: 'card_statement_descriptor',
+                label: 'Card Statement Descriptor',
+                rules: ['required'],
+                requires: ['payment_method' => 'card'],
             ),
         ]);
     }

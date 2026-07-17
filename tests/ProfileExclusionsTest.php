@@ -139,5 +139,8 @@ final class ProfileExclusionsTest extends TestCase
         self::assertArrayHasKey('excludedFromProfiles', $schema['definitions']['ConfigGroup']['properties']);
         self::assertArrayHasKey('excludedFromProfiles', $schema['definitions']['ConfigTab']['properties']);
         self::assertArrayHasKey('excludedFromProfiles', $schema['definitions']['ConfigFieldOption']['properties']);
+        self::assertArrayHasKey('requires', $schema['definitions']['ConfigField']['properties']);
+        self::assertArrayHasKey('requires', $schema['definitions']['ConfigGroup']['properties']);
+        self::assertArrayHasKey('requires', $schema['definitions']['ConfigFieldOption']['properties']);
     }
 }

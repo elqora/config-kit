@@ -68,6 +68,57 @@
         }
       ]
     },
+    "ConfigRequires": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/ConfigOptionValue"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ConfigOptionValue"
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "equals": {
+                "$ref": "#/definitions/ConfigOptionValue"
+              },
+              "not": {
+                "$ref": "#/definitions/ConfigOptionValue"
+              },
+              "in": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/ConfigOptionValue"
+                }
+              },
+              "notIn": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/ConfigOptionValue"
+                }
+              },
+              "filled": {
+                "type": "boolean"
+              },
+              "empty": {
+                "type": "boolean"
+              },
+              "regex": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "minProperties": 1
+          }
+        ]
+      },
+      "default": {}
+    },
     "ConfigFieldOption": {
       "type": "object",
       "properties": {
@@ -100,6 +151,9 @@
             "type": "string"
           },
           "default": []
+        },
+        "requires": {
+          "$ref": "#/definitions/ConfigRequires"
         },
         "children": {
           "type": "array",
@@ -301,6 +355,9 @@
             "type": "string"
           },
           "default": []
+        },
+        "requires": {
+          "$ref": "#/definitions/ConfigRequires"
         },
         "sandbox": {
           "type": "boolean",
@@ -632,6 +689,9 @@
             "type": "string"
           },
           "default": []
+        },
+        "requires": {
+          "$ref": "#/definitions/ConfigRequires"
         },
         "children": {
           "type": "object",

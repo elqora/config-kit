@@ -2,6 +2,8 @@
 
 namespace Elqora\ConfigKit\Schema;
 
+use Elqora\ConfigKit\Support\ConfigBag;
+
 final readonly class ConfigGroup implements ConfigNode
 {
     /**
@@ -11,6 +13,7 @@ final readonly class ConfigGroup implements ConfigNode
      * @param array<int,string> $includes
      * @param array<int,string> $excludes
      * @param array<int,string> $excludedFromProfiles
+     * @param array<string,mixed> $requires
      */
     public function __construct(
         public string $label,
@@ -21,6 +24,7 @@ final readonly class ConfigGroup implements ConfigNode
         public array $includes = [],
         public array $excludes = [],
         public array $excludedFromProfiles = [],
+        public array $requires = [],
     ) {}
 
     public function nodeType(): string
@@ -42,6 +46,7 @@ final readonly class ConfigGroup implements ConfigNode
             includes: $this->includes,
             excludes: $this->excludes,
             excludedFromProfiles: $this->excludedFromProfiles,
+            requires: $this->requires,
         );
     }
 
@@ -80,6 +85,32 @@ final readonly class ConfigGroup implements ConfigNode
             includes: $this->includes,
             excludes: $this->excludes,
             excludedFromProfiles: $this->excludedFromProfiles,
+            requires: $this->requires,
+        );
+    }
+
+    public function forRequirements(ConfigBag $bag): ?self
+    {
+        if (!SchemaRequirement::matches($this->requires, $bag)) {
+            return null;
+        }
+
+        $children = $this->childrenForRequirements($bag);
+
+        if ($children === [] && $this->children !== []) {
+            return null;
+        }
+
+        return new self(
+            label: $this->label,
+            required: $this->required,
+            children: $children,
+            meta: $this->meta,
+            tabs: $this->tabs,
+            includes: $this->includes,
+            excludes: $this->excludes,
+            excludedFromProfiles: $this->excludedFromProfiles,
+            requires: $this->requires,
         );
     }
 
@@ -94,10 +125,35 @@ final readonly class ConfigGroup implements ConfigNode
             'includes' => $this->includes,
             'excludes' => $this->excludes,
             'excludedFromProfiles' => $this->excludedFromProfiles,
+            'requires' => $this->requires,
             'children' => array_map(
                 static fn(ConfigNode $n) => $n->jsonSerialize(),
                 $this->children
             ),
         ];
+    }
+
+    /**
+     * @return array<string,ConfigNode>
+     */
+    private function childrenForRequirements(ConfigBag $bag): array
+    {
+        $children = [];
+
+        foreach ($this->children as $key => $child) {
+            if ($child instanceof ConfigField) {
+                $filtered = $child->forRequirements($bag);
+            } elseif ($child instanceof self) {
+                $filtered = $child->forRequirements($bag);
+            } else {
+                $filtered = $child;
+            }
+
+            if ($filtered instanceof ConfigNode) {
+                $children[$key] = $filtered;
+            }
+        }
+
+        return $children;
     }
 }
