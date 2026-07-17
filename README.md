@@ -667,7 +667,7 @@ enter or leave the repository adapter.
 
 ## Named Settings Providers
 
-DGP-style settings providers are supported through `SettingsContract`. It
+Named settings providers are supported through `SettingsContract`. It
 extends `ProvidesConfigSchema` and adds a stable settings name.
 
 ```php
@@ -855,8 +855,8 @@ A Laravel repository adapter should:
 A Laravel field validator adapter should wrap `Validator::make($data, $rules)`
 and return `ConfigValidationError` objects.
 
-A DGP-style settings target resolver can map provider names to `SiteConf`
-records:
+A settings target resolver can map provider names to application-specific
+records, such as a Laravel `SiteConf` model:
 
 ```php
 <?php
